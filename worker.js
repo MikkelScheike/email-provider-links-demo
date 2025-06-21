@@ -1,4 +1,25 @@
 // Cloudflare Worker for Email Provider Links Demo
+// Comprehensive Node.js polyfills for Cloudflare Workers
+globalThis.__dirname = '/';
+globalThis.__filename = '/worker.js';
+globalThis.process = globalThis.process || {
+  env: { NODE_ENV: 'production' },
+  cwd: () => '/'
+};
+
+// Polyfill path module functions
+globalThis.path = {
+  join: (...args) => args.filter(Boolean).join('/').replace(/\/+/g, '/'),
+  dirname: (path) => path.split('/').slice(0, -1).join('/') || '/',
+  resolve: (...args) => args.filter(Boolean).join('/').replace(/\/+/g, '/')
+};
+
+// Polyfill fs module functions
+globalThis.fs = {
+  existsSync: () => false,
+  readFileSync: () => '{}'
+};
+
 import { getEmailProvider } from '@mikkelscheike/email-provider-links';
 
 export default {
