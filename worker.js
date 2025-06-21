@@ -1,40 +1,6 @@
 // Cloudflare Worker for Email Provider Links Demo
-// Comprehensive Node.js polyfills for Cloudflare Workers
-globalThis.__dirname = '/';
-globalThis.__filename = '/worker.js';
-globalThis.process = globalThis.process || {
-  env: { NODE_ENV: 'production' },
-  cwd: () => '/'
-};
-
-// Polyfill path module functions
-globalThis.path = {
-  join: (...args) => args.filter(Boolean).join('/').replace(/\/+/g, '/'),
-  dirname: (path) => path.split('/').slice(0, -1).join('/') || '/',
-  resolve: (...args) => args.filter(Boolean).join('/').replace(/\/+/g, '/')
-};
-
 // Cache for provider data
 let cachedProviderData = null;
-
-// Polyfill fs module functions
-globalThis.fs = {
-  existsSync: (path) => {
-    // Return true for the providers file path
-    return path.includes('emailproviders.json');
-  },
-  readFileSync: (path, encoding) => {
-    // If it's the providers file, return cached data or throw an error to be caught
-    if (path.includes('emailproviders.json')) {
-      if (cachedProviderData) {
-        return cachedProviderData;
-      }
-      // If no cached data, throw an error that will be handled gracefully
-      throw new Error('Provider data not yet loaded');
-    }
-    return '{}';
-  }
-};
 
 // Function to load provider data from assets
 async function loadProviderData(env) {
@@ -89,6 +55,79 @@ async function loadProviderData(env) {
 }
 
 import { getEmailProvider } from '@mikkelscheike/email-provider-links';
+
+// Aggressive fs.readFileSync override - monkey patch all possible fs instances
+const customReadFileSync = (path, encoding) => {
+  if (path && path.includes('emailproviders.json')) {
+    if (cachedProviderData) {
+      return cachedProviderData;
+    }
+    throw new Error('Provider data not yet loaded');
+  }
+  return '{}';
+};
+
+// Override global fs if it exists
+if (globalThis.fs) {
+  globalThis.fs.readFileSync = customReadFileSync;
+}
+
+// Override any fs that might be in global namespace
+if (globalThis.require) {
+  try {
+    const fs = globalThis.require('fs');
+    if (fs) fs.readFileSync = customReadFileSync;
+  } catch (e) {}
+}
+
+// Try to access the fs module used by unenv and override it
+if (typeof process !== 'undefined' && process.versions && process.versions.node) {
+  try {
+    // This might be the unenv fs module
+    const Module = globalThis.module || {};
+    if (Module.require) {
+      const fs = Module.require('fs');
+      if (fs) fs.readFileSync = customReadFileSync;
+    }
+  } catch (e) {}
+}
+
+// Override unenv fs polyfills after import
+if (typeof globalThis.fs === 'object' && globalThis.fs.readFileSync) {
+  const originalReadFileSync = globalThis.fs.readFileSync;
+  globalThis.fs.readFileSync = (path, encoding) => {
+    // If it's the providers file, return cached data or throw an error to be caught
+    if (path.includes('emailproviders.json')) {
+      if (cachedProviderData) {
+        return cachedProviderData;
+      }
+      // If no cached data, throw an error that will be handled gracefully
+      throw new Error('Provider data not yet loaded');
+    }
+    return originalReadFileSync ? originalReadFileSync(path, encoding) : '{}';
+  };
+}
+
+// Also ensure our global fs override is in place
+if (typeof require !== 'undefined') {
+  try {
+    const fsModule = require('fs');
+    if (fsModule && fsModule.readFileSync) {
+      const originalReadFileSync = fsModule.readFileSync;
+      fsModule.readFileSync = (path, encoding) => {
+        if (path.includes('emailproviders.json')) {
+          if (cachedProviderData) {
+            return cachedProviderData;
+          }
+          throw new Error('Provider data not yet loaded');
+        }
+        return originalReadFileSync ? originalReadFileSync(path, encoding) : '{}';
+      };
+    }
+  } catch (e) {
+    // require might not be available, that's fine
+  }
+}
 
 export default {
   async fetch(request, env, ctx) {
