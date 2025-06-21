@@ -14,11 +14,79 @@ globalThis.path = {
   resolve: (...args) => args.filter(Boolean).join('/').replace(/\/+/g, '/')
 };
 
+// Cache for provider data
+let cachedProviderData = null;
+
 // Polyfill fs module functions
 globalThis.fs = {
-  existsSync: () => false,
-  readFileSync: () => '{}'
+  existsSync: (path) => {
+    // Return true for the providers file path
+    return path.includes('emailproviders.json');
+  },
+  readFileSync: (path, encoding) => {
+    // If it's the providers file, return cached data or throw an error to be caught
+    if (path.includes('emailproviders.json')) {
+      if (cachedProviderData) {
+        return cachedProviderData;
+      }
+      // If no cached data, throw an error that will be handled gracefully
+      throw new Error('Provider data not yet loaded');
+    }
+    return '{}';
+  }
 };
+
+// Function to load provider data from assets
+async function loadProviderData(env) {
+  if (!cachedProviderData) {
+    try {
+      const response = await env.ASSETS.fetch(new Request('https://dummy.com/emailproviders.json'));
+      if (response.ok) {
+        cachedProviderData = await response.text();
+      } else {
+        // Fallback data if asset loading fails
+        cachedProviderData = JSON.stringify({
+          "version": "2.0",
+          "providers": [
+            {
+              "id": "g",
+              "name": "Gmail",
+              "url": "https://mail.google.com/mail/",
+              "domains": ["gmail.com", "googlemail.com"]
+            },
+            {
+              "id": "outlook",
+              "name": "Outlook",
+              "url": "https://outlook.live.com",
+              "domains": ["outlook.com", "hotmail.com", "live.com"]
+            },
+            {
+              "id": "yahoo",
+              "name": "Yahoo",
+              "url": "https://mail.yahoo.com",
+              "domains": ["yahoo.com"]
+            }
+          ]
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to load provider data:', error);
+      // Use fallback data
+      cachedProviderData = JSON.stringify({
+        "version": "2.0",
+        "providers": [
+          {
+            "id": "g",
+            "name": "Gmail",
+            "url": "https://mail.google.com/mail/",
+            "domains": ["gmail.com", "googlemail.com"]
+          }
+        ]
+      });
+    }
+  }
+  return cachedProviderData;
+}
 
 import { getEmailProvider } from '@mikkelscheike/email-provider-links';
 
@@ -41,6 +109,9 @@ export default {
     // API endpoint for email provider detection
     if (url.pathname === '/api/detect-provider' && request.method === 'POST') {
       try {
+        // Preload provider data before processing request
+        await loadProviderData(env);
+        
         const { email, timeout = 5000 } = await request.json();
         
         if (!email) {
