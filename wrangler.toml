@@ -1,13 +1,12 @@
-# Cloudflare Workers configuration for email-provider-links demo
-
 name = "email-provider-links-demo"
-main = "server.js"
-compatibility_date = "2024-01-01"
-node_compat = true
+main = "worker.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
 
 [vars]
 NODE_ENV = "production"
 
-# For Pages deployment (alternative to Workers)
-# [[pages_build_output_dir]]
-# output_dir = "dist"
+# Static assets configuration for Workers
+[assets]
+directory = "./"
+binding = "ASSETS"

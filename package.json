@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "node server.js",
+    "dev:worker": "wrangler dev",
     "start": "node server.js",
+    "deploy": "wrangler deploy",
     "dev:mock": "python3 -m http.server 3000",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
