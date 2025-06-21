@@ -19,6 +19,14 @@
   "author": "Mikkel Scheike",
   "license": "MIT",
   "description": "Demo showcasing email-provider-links library with a modern signup form",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MikkelScheike/email-provider-links-demo.git"
+  },
+  "homepage": "https://github.com/MikkelScheike/email-provider-links-demo#readme",
+  "bugs": {
+    "url": "https://github.com/MikkelScheike/email-provider-links-demo/issues"
+  },
   "dependencies": {
     "@mikkelscheike/email-provider-links": "^2.4.0",
     "express": "^5.1.0",
