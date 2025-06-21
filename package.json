@@ -1,0 +1,31 @@
+{
+  "name": "email-provider-link-demo",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "dev:mock": "python3 -m http.server 3000",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "email",
+    "provider",
+    "demo",
+    "signup",
+    "login"
+  ],
+  "author": "Mikkel Scheike",
+  "license": "MIT",
+  "description": "Demo showcasing email-provider-links library with a modern signup form",
+  "dependencies": {
+    "@mikkelscheike/email-provider-links": "^2.4.0",
+    "express": "^5.1.0",
+    "simple-icons": "^15.2.0",
+    "wrangler": "^4.20.5"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.5"
+  }
+}

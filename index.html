@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Provider Links Demo - Smart Signup</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Skip navigation link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div class="container">
+        <main id="main-content" class="signup-card">
+            <div class="demo-title">
+                <h2>Email Provider Link Demo</h2>
+                <p class="demo-subtitle">Don't worry, your email isn't being saved. This is just for testing purposes.</p>
+            </div>
+            
+            <form class="signup-form" id="signupForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-button-row">
+                        <input type="email" id="email" name="email" required placeholder="john@example.com" autocomplete="email" aria-describedby="providerDetection">
+                        <button type="submit" class="signup-btn" id="signupBtn">
+                            <span class="btn-text">See result</span>
+                            <span class="btn-spinner"></span>
+                        </button>
+                    </div>
+                    <div class="provider-detection" id="providerDetection" aria-live="polite" aria-atomic="true"></div>
+                </div>
+            </form>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection"></div>
+            
+            <!-- About Link -->
+            <div class="about-link">
+                <a href="/about.html" class="repo-badge about featured">
+                    <span class="repo-icon">ℹ️</span>
+                    <span class="repo-text">About & Guide</span>
+                    <span class="repo-arrow">→</span>
+                </a>
+            </div>
+            
+            <!-- Repository Links -->
+            <div class="repo-links">
+                <div class="link-group">
+                    <a href="https://github.com/MikkelScheike/email-provider-links" target="_blank" class="repo-badge">
+                        <span class="repo-icon">📚</span>
+                        <span class="repo-text">Library Repository</span>
+                        <span class="repo-arrow">→</span>
+                    </a>
+                    <a href="https://github.com/MikkelScheike/email-provider-links-demo" target="_blank" class="repo-badge">
+                        <span class="repo-icon">🎯</span>
+                        <span class="repo-text">Demo Repository</span>
+                        <span class="repo-arrow">→</span>
+                    </a>
+                    <a href="https://www.npmjs.com/package/@mikkelscheike/email-provider-links" target="_blank" class="repo-badge npm">
+                        <span class="repo-icon">📦</span>
+                        <span class="repo-text">View on NPM</span>
+                        <span class="repo-arrow">→</span>
+                    </a>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Hosted by <strong>Cloudflare</strong></p>
+            <p>Developed by <a href="https://mikkelscheike.com" target="_blank">Mikkel Scheike</a></p>
+        </footer>
+    </div>
+
+    <script src="script-api.js"></script>
+</body>
+</html>
