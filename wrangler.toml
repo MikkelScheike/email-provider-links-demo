@@ -6,6 +6,10 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 NODE_ENV = "production"
 
+# Build configuration
+[build]
+command = "npm run build"
+
 # Static assets configuration for Workers
 [assets]
 directory = "./public"
