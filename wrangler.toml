@@ -8,5 +8,5 @@ NODE_ENV = "production"
 
 # Static assets configuration for Workers
 [assets]
-directory = "./"
+directory = "./public"
 binding = "ASSETS"

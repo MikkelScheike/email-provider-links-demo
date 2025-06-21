@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "node server.js",
-    "dev:worker": "wrangler dev",
+    "build": "mkdir -p public && cp index.html about.html styles.css script-api.js microsoftoutlook.svg public/",
+    "dev:worker": "npm run build && wrangler dev",
     "start": "node server.js",
-    "deploy": "wrangler deploy",
+    "deploy": "npm run build && wrangler deploy",
     "dev:mock": "python3 -m http.server 3000",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
