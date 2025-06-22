@@ -2,7 +2,7 @@
   "name": "email-provider-link-demo",
   "version": "1.0.0",
   "type": "module",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "dev": "node server.js",
     "build": "mkdir -p public && cp index.html about.html styles.css script-api.js microsoftoutlook.svg public/",
