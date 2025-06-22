@@ -2,7 +2,7 @@
   "name": "email-provider-link-demo",
   "version": "1.0.0",
   "type": "module",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "dev": "node server.js",
     "build": "mkdir -p public && cp index.html about.html styles.css script-api.js microsoftoutlook.svg public/",
@@ -34,5 +34,8 @@
   },
   "devDependencies": {
     "esbuild": "^0.25.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
