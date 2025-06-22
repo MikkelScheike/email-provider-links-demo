@@ -37,7 +37,7 @@ body {
 
 .container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 95vw;
 }
 
 /* Header */
@@ -1462,7 +1462,7 @@ body {
     
     .container {
         padding: 0;
-        max-width: calc(100vw - 0.25rem);
+        max-width: 98vw;
     }
     
     .demo-header {
