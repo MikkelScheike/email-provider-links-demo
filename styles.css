@@ -1163,9 +1163,16 @@ body {
 .feature-grid,
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
     margin-top: 2rem;
+}
+
+/* Force side-by-side layout on desktop for tools section */
+@media (min-width: 769px) {
+    .features-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
 .feature-card {
