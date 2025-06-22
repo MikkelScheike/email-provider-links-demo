@@ -25,6 +25,8 @@ A beautiful, interactive demo showcasing the power of the `@mikkelscheike/email-
 
 ## 🛠️ Running the Demo
 
+### Local Development
+
 1. **Install dependencies**:
    ```bash
    npm install
@@ -39,6 +41,27 @@ A beautiful, interactive demo showcasing the power of the `@mikkelscheike/email-
    ```
    http://localhost:3000
    ```
+
+### Deploy to Render.com
+
+This demo is configured for easy deployment to Render.com:
+
+1. **Fork this repository** to your GitHub account
+
+2. **Connect to Render.com**:
+   - Go to [render.com](https://render.com) and sign up/login
+   - Click "New +" → "Web Service"
+   - Connect your GitHub repository
+
+3. **Configure the service**:
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+   - **Environment**: `Node`
+   - **Health Check Path**: `/api/health`
+
+4. **Deploy**: Click "Create Web Service"
+
+The `render.yaml` file in this repository contains all the necessary configuration for automatic deployment.
 
 ## 🔍 What's Happening Behind the Scenes?
 
