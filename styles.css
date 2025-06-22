@@ -1160,7 +1160,8 @@ body {
     font-style: italic;
 }
 
-.feature-grid {
+.feature-grid,
+.features-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.5rem;
@@ -1449,12 +1450,12 @@ body {
 /* Responsive */
 @media (max-width: 768px) {
     body {
-        padding: 0.25rem;
+        padding: 0.125rem;
     }
     
     .container {
         padding: 0;
-        max-width: calc(100vw - 0.5rem);
+        max-width: calc(100vw - 0.25rem);
     }
     
     .demo-header {
@@ -1572,5 +1573,15 @@ body {
     .nav-button {
         width: 200px;
         justify-content: center;
+    }
+    
+    /* Features grid mobile spacing */
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .feature-card {
+        margin-bottom: 1rem;
     }
 }
