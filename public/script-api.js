@@ -12,83 +12,36 @@ const resultsSection = document.getElementById('resultsSection');
 let currentDetectedProvider = null;
 let detectionTimeout = null;
 
-// Provider logos mapping
-const providerLogos = {
-    'Gmail': '📧',
-    'Microsoft Outlook': '📬',
-    'Yahoo Mail': '📮',
-    'ProtonMail': '🔒',
-    'iCloud Mail': '🍎',
-    'Tutanota': '🛡️',
-    'FastMail': '⚡',
-    'Zoho Mail': '📊',
-    'AOL Mail': '📪',
-    'GMX': '📫',
-    'Google Workspace': '🏢',
-    'Microsoft 365': '🏬',
-    'Amazon WorkMail': '📦',
-    // Proxy/Alias Services
-    'SimpleLogin': '🎭',
-    'AnonAddy': '🕶️',
-    'Firefox Relay': '🦊',
-    'DuckDuckGo': '🦆',
-    'Hide My Email': '🍎',
-    'default': '📧'
-};
-
 // Check if a provider is a proxy/alias service
 function isProxyService(provider) {
     if (!provider || !provider.companyProvider) return false;
-    
-    const proxyServices = [
-        'SimpleLogin', 'AnonAddy', 'Firefox Relay', 'DuckDuckGo', 
-        'Hide My Email', 'Relay', 'Alias', 'Cloudflare'
-    ];
-    
-    return proxyServices.some(service => 
-        provider.companyProvider.toLowerCase().includes(service.toLowerCase())
-    );
+    const proxyServices = ['SimpleLogin', 'AnonAddy', 'Firefox Relay', 'DuckDuckGo', 'Hide My Email', 'Relay', 'Alias', 'Cloudflare'];
+    return proxyServices.some(service => provider.companyProvider.toLowerCase().includes(service.toLowerCase()));
 }
 
-// Get provider logo as SVG
+// Get provider logo
 function getProviderLogo(provider, size = 24) {
     if (!provider) return `<div class="provider-icon fallback">📧</div>`;
     
-    // Map provider names to icon names
+    // Common provider icons (served by our API)
     const iconMap = {
         'Gmail': 'gmail',
         'Google Workspace': 'google',
         'Microsoft Outlook': 'outlook',
         'Microsoft 365': 'microsoft',
-        'Microsoft 365 (Business)': 'microsoft',
         'Yahoo Mail': 'yahoo',
         'ProtonMail': 'protonmail',
-        'iCloud Mail': 'icloud',
-        'Tutanota': 'tutanota',
-        'FastMail': 'fastmail',
-        'Zoho Mail': 'zoho',
-        'AOL Mail': 'aol',
-        'GMX': 'gmx',
-        'SimpleLogin': 'simplelogin',
-        'Firefox Relay': 'firefox',
-        'DuckDuckGo': 'duckduckgo',
-        'Cloudflare': 'cloudflare'
+        'iCloud Mail': 'icloud'
     };
     
     const iconName = iconMap[provider.companyProvider];
-    
     if (iconName) {
         return `<img src="/api/icon/${iconName}" alt="${provider.companyProvider}" class="provider-icon svg" width="${size}" height="${size}">`;
     }
     
-    // Fallback to emoji for unknown providers
-    const fallbackEmojis = {
-        'Amazon WorkMail': '📦',
-        'Hide My Email': '🍎',
-        'AnonAddy': '🕶️'
-    };
-    
-    const emoji = fallbackEmojis[provider.companyProvider] || '📧';
+    // Emoji fallback for other providers
+    const emoji = provider.companyProvider.includes('Amazon') ? '📦' : 
+                  provider.companyProvider.includes('Apple') ? '🍎' : '📧';
     return `<div class="provider-icon fallback">${emoji}</div>`;
 }
 
