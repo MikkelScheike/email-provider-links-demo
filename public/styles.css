@@ -1448,8 +1448,18 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
+    body {
+        padding: 0.25rem;
+    }
+    
     .container {
-        padding: 1rem;
+        padding: 0;
+        max-width: calc(100vw - 0.5rem);
+    }
+    
+    .demo-header {
+        margin-bottom: 1.5rem;
+        padding: 0 0.5rem;
     }
     
     .demo-header h1 {
@@ -1457,11 +1467,15 @@ body {
     }
     
     .signup-card {
-        padding: 2rem;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        border-radius: 16px;
     }
     
     .demo-info {
-        padding: 2rem;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        border-radius: 16px;
     }
     
     .info-grid {
