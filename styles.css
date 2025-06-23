@@ -183,6 +183,7 @@ body {
     max-width: 720px; /* Match the width of result card */
     margin: 0 auto;
     align-items: center;
+    text-align: center;
 }
 
 .email-input-row {
@@ -197,6 +198,8 @@ body {
     font-weight: 500;
     color: #2d3748;
     font-size: 0.9rem;
+    text-align: center;
+    width: 100%;
 }
 
 .form-group input {
