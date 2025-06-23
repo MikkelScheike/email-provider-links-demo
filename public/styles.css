@@ -37,7 +37,9 @@ body {
 
 .container {
     width: 100%;
-    max-width: 1040px; /* Increased from 800px by 30% */
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 2rem;
 }
 
 /* Header */
