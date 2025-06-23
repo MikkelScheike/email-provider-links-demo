@@ -52,20 +52,22 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="container">
         <main id="main-content" class="signup-card">
-            <div class="demo-title">
-                <h2>Email Provider Link Demo</h2>
-                <p class="demo-subtitle">Rest assured, your email isn't being saved.</p>
+<div class="demo-title">
+                <h2>Email Details Demo</h2>
+                <p class="demo-subtitle">Enter an email address to see its details</p>
             </div>
             
             <form class="signup-form" id="signupForm">
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <div class="input-button-row">
-                        <input type="email" id="email" name="email" required placeholder="john@example.com" autocomplete="email" aria-describedby="providerDetection">
-                        <button type="submit" class="signup-btn" id="signupBtn">
-                            <span class="btn-text">See result</span>
-                            <span class="btn-spinner"></span>
-                        </button>
+<div class="form-group">
+<div class="email-input-container">
+                        <label for="email">Email Address</label>
+                        <div class="email-input-row">
+                            <input type="email" id="email" name="email" required placeholder="john@example.com" autocomplete="email">
+                            <button type="submit" class="signup-btn" id="signupBtn">
+                                <span class="btn-text">See result</span>
+                                <span class="btn-spinner"></span>
+                            </button>
+                        </div>
                     </div>
                     <div class="provider-detection" id="providerDetection" aria-live="polite" aria-atomic="true"></div>
                 </div>

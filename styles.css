@@ -37,7 +37,7 @@ body {
 
 .container {
     width: 100%;
-    max-width: 50vw;
+    max-width: 1040px; /* Increased from 800px by 30% */
 }
 
 /* Header */
@@ -48,14 +48,14 @@ body {
 }
 
 .demo-header h1 {
-    font-size: 3rem;
+    font-size: 3.9rem; /* Increased from 3rem by 30% */
     font-weight: 700;
-    margin-bottom: 1rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1.3rem; /* Increased from 1rem by 30% */
+    text-shadow: 0 2.6px 5.2px rgba(0,0,0,0.1);
 }
 
 .demo-header p {
-    font-size: 1.2rem;
+    font-size: 1.56rem; /* Increased from 1.2rem by 30% */
     opacity: 0.9;
     font-weight: 400;
 }
@@ -64,11 +64,12 @@ body {
 .signup-card {
     background: white;
     border-radius: 20px;
-    padding: 3rem;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    margin-bottom: 3rem;
+    padding: 3.9rem; /* Increased from 3rem by 30% */
+    box-shadow: 0 26px 52px rgba(0,0,0,0.1); /* Increased shadow to match new size */
+    margin-bottom: 3.9rem;
     margin-left: auto;
     margin-right: auto;
+    width: 100%;
 }
 
 /* Demo Title */
@@ -79,9 +80,9 @@ body {
 
 .demo-title h2 {
     color: #2d3748;
-    font-size: 1.8rem;
+    font-size: 2.34rem; /* Increased from 1.8rem by 30% */
     font-weight: 600;
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.65rem 0;
 }
 
 .demo-subtitle {
@@ -167,7 +168,23 @@ body {
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1rem;
+    align-items: center;
+}
+
+.email-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 720px; /* Match the width of result card */
+    margin: 0 auto;
+}
+
+.email-input-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
 }
 
 .form-group label {
@@ -177,12 +194,13 @@ body {
 }
 
 .form-group input {
-    padding: 1rem;
+    padding: 1.3rem; /* Increased from 1rem by 30% */
     border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 1rem;
+    border-radius: 15.6px; /* Increased from 12px by 30% */
+    font-size: 1.3rem; /* Increased from 1rem by 30% */
     transition: all 0.2s ease;
     background: #f7fafc;
+    width: 100%;
 }
 
 .form-group input:focus {
@@ -197,6 +215,9 @@ body {
     display: flex;
     gap: 1rem;
     align-items: stretch;
+    width: 100%;
+    max-width: 432px; /* Increased from 360px by 20% */
+    margin: 0 auto;
 }
 
 .input-button-row input {
@@ -210,95 +231,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Provider Detection */
-.provider-detection {
-    min-height: 60px;
-    margin-top: 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.provider-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
-    border-radius: 12px;
-    border: 1px solid #c7d2fe;
-    animation: slideIn 0.3s ease;
-}
-
-.provider-info.detecting {
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    border-color: #f59e0b;
-}
-
-.provider-info.detected {
-    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-    border-color: #10b981;
-}
-
-.provider-info.business {
-    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
-    border-color: #6366f1;
-}
-
-.provider-info.proxy {
-    background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
-    border-color: #a855f7;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.provider-logo {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    background: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.provider-icon.svg {
-    border-radius: 4px;
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
-}
-
-.provider-details {
-    flex: 1;
-}
-
-.provider-name {
-    font-weight: 600;
-    color: #1a202c;
-    margin-bottom: 0.2rem;
-}
-
-.provider-subtitle {
-    font-size: 0.85rem;
-    color: #4a5568;
-}
-
-.detection-method {
-    font-size: 0.75rem;
-    color: #6b7280;
-    background: rgba(255,255,255,0.7);
-    padding: 0.2rem 0.5rem;
-    border-radius: 6px;
-    margin-left: auto;
-}
 
 /* Signup Button */
 .signup-btn {
@@ -313,7 +245,8 @@ body {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    margin-top: 1rem;
+    min-width: 140px;
+    white-space: nowrap;
 }
 
 .signup-btn:hover {
@@ -350,6 +283,16 @@ body {
 }
 
 /* Results Section */
+.provider-detection {
+    min-height: 60px;
+    margin-top: 0.5rem;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 720px; /* Increased from 600px by 20% */
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .results-card {
     background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
     border: 2px solid #16a34a;
@@ -509,24 +452,24 @@ body {
     box-shadow: 0 8px 25px rgba(22, 163, 74, 0.4);
 }
 
-/* Business email styling */
+/* Business email styling - now using default green */
 .results-card.business {
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-    border-color: #2563eb;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-color: #16a34a;
 }
 
 .results-card.business .results-title h3,
 .results-card.business .results-content p,
 .results-card.business .detection-details h4 {
-    color: #1e40af;
+    color: #166534;
 }
 
 .results-card.business .results-title p {
-    color: #2563eb;
+    color: #16a34a;
 }
 
 .results-card.business .inbox-button {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
 }
 
 /* Proxy service styling */
@@ -1008,6 +951,11 @@ body {
     .input-button-row {
         flex-direction: column;
         gap: 1rem;
+        align-items: center;
+    }
+    
+    .form-group input {
+        max-width: 100%;
     }
     
     .input-button-row .signup-btn {
