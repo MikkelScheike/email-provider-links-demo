@@ -777,14 +777,21 @@ body {
 /* Use Cases */
 .use-cases {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
     margin-top: 2rem;
 }
 
-/* Special grid for Built With Amazing Tools section */
-.about-section:last-of-type .use-cases {
+.use-cases:not(.tools-grid) {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.tools-grid {
     grid-template-columns: repeat(2, 1fr);
+}
+
+/* Special grid for Built With Amazing Tools section */
+.tools-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
 }
 
 .use-case {
