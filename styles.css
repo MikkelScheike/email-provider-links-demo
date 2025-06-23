@@ -243,6 +243,24 @@ body {
     margin: 0 auto;
 }
 
+@media (max-width: 480px) {
+    .input-button-row {
+        flex-direction: column;
+        align-items: center;
+        padding: 0 1rem;
+    }
+
+    .input-button-row input {
+        max-width: 100%;
+        text-align: center;
+    }
+
+    .input-button-row .signup-btn {
+        width: 100%;
+        margin: 0;
+    }
+}
+
 .input-button-row input {
     flex: 1;
 }
