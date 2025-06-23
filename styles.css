@@ -782,6 +782,11 @@ body {
     margin-top: 2rem;
 }
 
+/* Special grid for Built With Amazing Tools section */
+.about-section:last-of-type .use-cases {
+    grid-template-columns: repeat(2, 1fr);
+}
+
 .use-case {
     background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
     border: 1px solid #93c5fd;
