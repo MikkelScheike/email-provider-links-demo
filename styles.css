@@ -193,10 +193,9 @@ body {
     flex-direction: column;
     gap: 1rem;
     width: 100%;
-    max-width: 720px; /* Match the width of result card */
+    max-width: 720px;
     margin: 0 auto;
     align-items: center;
-    text-align: center;
 }
 
 .email-input-row {
@@ -205,25 +204,25 @@ body {
     align-items: center;
     width: 100%;
     justify-content: center;
+    max-width: 432px;
+    margin: 0 auto;
+    padding: 0 1rem;
 }
 
 .form-group label {
     font-weight: 500;
     color: #2d3748;
     font-size: 0.9rem;
-    text-align: center;
-    width: 100%;
 }
 
 .form-group input {
-    padding: 1.3rem; /* Increased from 1rem by 30% */
+    padding: 1.3rem;
     border: 2px solid #e2e8f0;
-    border-radius: 15.6px; /* Increased from 12px by 30% */
-    font-size: 1.3rem; /* Increased from 1rem by 30% */
+    border-radius: 15.6px;
+    font-size: 1.3rem;
     transition: all 0.2s ease;
     background: #f7fafc;
     width: 100%;
-    max-width: 500px; /* Limit input width */
 }
 
 .form-group input:focus {
@@ -239,35 +238,40 @@ body {
     gap: 1rem;
     align-items: stretch;
     width: 100%;
-    max-width: 432px; /* Increased from 360px by 20% */
+    max-width: 432px;
     margin: 0 auto;
-}
-
-@media (max-width: 480px) {
-    .input-button-row {
-        flex-direction: column;
-        align-items: center;
-        padding: 0 1rem;
-    }
-
-    .input-button-row input {
-        max-width: 100%;
-        text-align: center;
-    }
-
-    .input-button-row .signup-btn {
-        width: 100%;
-        margin: 0;
-    }
 }
 
 .input-button-row input {
     flex: 1;
+    width: 100%;
 }
 
 .input-button-row .signup-btn {
-    margin-top: 0;
+    margin: 0;
     white-space: nowrap;
+    min-width: 160px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .email-input-row {
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+        max-width: 280px;
+    }
+
+    .input-button-row {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .input-button-row input,
+    .input-button-row .signup-btn {
+        width: 100%;
+    }
+}
     min-width: 160px;
     flex-shrink: 0;
 }
@@ -1004,24 +1008,35 @@ body {
         margin-bottom: 1.5rem;
     }
     
-    /* Keep input and button centered on mobile */
+/* Keep input and button centered on mobile */
+    .email-input-container {
+        padding: 0 1rem;
+    }
+
     .email-input-row {
-        display: flex;
         flex-direction: column;
-        gap: 1rem;
         align-items: center;
-        justify-content: center;
+        max-width: 280px;
+        padding: 0;
+    }
+    
+    .input-button-row {
+        flex-direction: column;
+        align-items: center;
         width: 100%;
+        max-width: 280px;
     }
     
-    .form-group input {
+    .input-button-row input,
+    .input-button-row .signup-btn {
+        width: 280px;
         max-width: 100%;
-        text-align: center;
+        min-width: unset;
+        margin: 0;
     }
-    
-    .signup-btn {
-        min-width: 200px;
-        margin: 0 auto;
+
+    .input-button-row .signup-btn {
+        margin-top: 0.5rem;
     }
     
     /* Stack repository links on mobile */
