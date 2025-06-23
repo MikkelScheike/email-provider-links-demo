@@ -3,14 +3,12 @@
 
 // DOM elements
 const emailInput = document.getElementById('email');
-const providerDetection = document.getElementById('providerDetection');
 const signupForm = document.getElementById('signupForm');
 const signupBtn = document.getElementById('signupBtn');
 const resultsSection = document.getElementById('resultsSection');
 
 // State
 let currentDetectedProvider = null;
-let detectionTimeout = null;
 
 // Check if a provider is a proxy/alias service
 function isProxyService(provider) {
@@ -190,81 +188,17 @@ function enableSubmitButton(text = 'See result') {
 
 // Handle email input changes
 function handleEmailChange() {
-    console.log('🎯 handleEmailChange called with value:', emailInput.value);
     const email = emailInput.value.trim();
-    
-    // Clear previous timeout
-    if (detectionTimeout) {
-        clearTimeout(detectionTimeout);
-    }
-    
-    // Clear detection and results if email is empty or invalid
-    if (!email || !email.includes('@')) {
-        clearProviderDetection();
-        clearResults();
-        enableSubmitButton();
-        return;
-    }
     
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-        // Only clear if we currently have content to avoid unnecessary DOM changes
-        if (providerDetection.innerHTML.trim() !== '') {
-            clearProviderDetection();
-        }
-        enableSubmitButton();
+        disableSubmitButton();
         return;
     }
     
-    // Show detecting state and disable button for all domains
-    const domain = email.split('@')[1].toLowerCase();
-    const commonDomains = ['gmail.com', 'googlemail.com', 'outlook.com', 'hotmail.com', 'live.com', 'icloud.com', 'protonmail.com', 'proton.me', 'yahoo.com', 'aol.com'];
-    
-    // Always show detecting state and disable button during detection
-    showProviderDetection('detecting');
-    disableSubmitButton('Detecting provider...');
-    
-    // Determine timeout based on domain type
-    const isCommonDomain = commonDomains.includes(domain);
-    const detectionDelay = isCommonDomain ? 100 : 250; // Faster for common domains
-    
-    // Debounce the detection
-    detectionTimeout = setTimeout(async () => {
-        try {
-            console.log('🔍 Detecting provider for:', email);
-            const result = await detectEmailProvider(email, 3000); // 3 second timeout for demo
-            console.log('✅ Detection result:', result);
-            console.log('✅ Provider found:', result.provider);
-            console.log('✅ Detection method:', result.detectionMethod);
-            
-            if (result.provider) {
-                currentDetectedProvider = result;
-                console.log('✅ Showing detected provider:', result.provider.companyProvider);
-                showProviderDetection('detected', result.provider, result.detectionMethod, result._meta);
-            } else if (result.proxyService) {
-                // Handle proxy service detection (like Cloudflare)
-                currentDetectedProvider = result;
-                const proxyProvider = {
-                    companyProvider: result.proxyService
-                };
-                console.log('✅ Showing detected proxy service:', result.proxyService);
-                showProviderDetection('detected', proxyProvider, result.detectionMethod, result._meta);
-            } else {
-                currentDetectedProvider = result;
-                console.log('⚠️ No provider found, showing not_found state');
-                showProviderDetection('not_found');
-            }
-            
-            // Re-enable the button after detection completes
-            enableSubmitButton();
-        } catch (error) {
-            console.error('❌ Error detecting email provider:', error);
-            currentDetectedProvider = null;
-            showProviderDetection('error');
-            enableSubmitButton(); // Enable even on error
-        }
-    }, detectionDelay); // Use dynamic delay based on domain type
+    enableSubmitButton();
+    clearResults();
 }
 
 // Handle form submission
@@ -274,32 +208,39 @@ async function handleFormSubmit(event) {
     const email = emailInput.value.trim();
     if (!email) return;
     
-    console.log('📝 Form submitted for email:', email);
-    console.log('📝 Current detected provider state:', currentDetectedProvider);
-    
-    // If we don't have a current provider state, try to detect it again
-    if (!currentDetectedProvider) {
-        console.log('⚠️ No current provider state, detecting again...');
-        try {
-            const result = await detectEmailProvider(email, 3000);
-            currentDetectedProvider = result;
-            console.log('✅ Re-detected provider:', result);
-        } catch (error) {
-            console.error('❌ Re-detection failed:', error);
-        }
-    }
+    // Clear any existing results first
+    clearProviderDetection();
+    clearResults();
     
     // Show loading state
     signupBtn.classList.add('loading');
     
-    // Simulate signup process
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Call the API to get the email details
+    try {
+        const response = await fetch('/api/detect-provider', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email })
+        });
+        
+        const result = await response.json();
+        currentDetectedProvider = result;
+        
+        // Show the nice formatted results
+        showInlineResults(email);
+    } catch (error) {
+        resultsSection.innerHTML = `
+            <div class="results-card error">
+                <h3>Error:</h3>
+                <p>Failed to fetch email details.</p>
+            </div>
+        `;
+    }
     
     // Hide loading state
     signupBtn.classList.remove('loading');
-    
-    // Show inline results in the provider detection area (no need to clear first)
-    showInlineResults(email);
 }
 
 // Show inline results in the provider detection area
@@ -390,7 +331,7 @@ function showInlineResults(email) {
                         </div>
                         
                         <div class="raw-response-toggle">
-                            <button class="toggle-btn" onclick="toggleRawResponse(this)" aria-expanded="false" aria-controls="raw-response-content">
+<button class="toggle-btn" onclick="toggleRawResponse(this, event)" aria-expanded="false" aria-controls="raw-response-content">
                                 <span class="toggle-icon">▶</span> View Full API Response
                             </button>
                             <div class="raw-response hide" id="raw-response-content">
@@ -400,7 +341,7 @@ function showInlineResults(email) {
                     </div>
                 </div>
                 ${currentDetectedProvider.loginUrl ? `
-                    <button class="inbox-button" onclick="openEmailInbox()">
+<button class="inbox-button" onclick="openEmailInbox(event)">
                         Go to your ${provider.companyProvider} inbox →
                     </button>
                 ` : `
@@ -454,7 +395,11 @@ function showInlineResults(email) {
 }
 
 // Open email inbox
-function openEmailInbox() {
+function openEmailInbox(event) {
+    // Prevent form submission
+    event.preventDefault();
+    event.stopPropagation();
+    
     if (currentDetectedProvider && currentDetectedProvider.loginUrl) {
         window.open(currentDetectedProvider.loginUrl, '_blank');
     }
@@ -481,7 +426,11 @@ window.addEventListener('load', clearFormOnLoad);
 document.addEventListener('DOMContentLoaded', clearFormOnLoad);
 
 // Toggle raw response display
-function toggleRawResponse(button) {
+function toggleRawResponse(button, event) {
+    // Prevent the click from triggering form submission
+    event.preventDefault();
+    event.stopPropagation();
+    
     const rawResponse = button.parentElement.querySelector('.raw-response');
     const icon = button.querySelector('.toggle-icon');
     const isExpanded = button.getAttribute('aria-expanded') === 'true';
