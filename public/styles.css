@@ -225,6 +225,24 @@ body {
     width: 100%;
     max-width: 432px; /* Increased from 360px by 20% */
     margin: 0 auto;
+    flex-direction: row;
+}
+
+@media (max-width: 480px) {
+    .input-button-row {
+        flex-direction: column;
+        max-width: 100%;
+        padding: 0 1rem;
+    }
+
+    .input-button-row input {
+        max-width: 100%;
+    }
+
+    .input-button-row .signup-btn {
+        width: 100%;
+        min-width: auto;
+    }
 }
 
 .input-button-row input {
