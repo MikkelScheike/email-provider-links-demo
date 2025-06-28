@@ -805,11 +805,11 @@ body {
     margin-top: 2rem;
 }
 
-.use-cases:not(.tools-grid) {
+.use-cases {
     grid-template-columns: repeat(4, 1fr);
 }
 
-.tools-grid {
+.use-cases.tools-grid {
     grid-template-columns: repeat(2, 1fr);
 }
 
@@ -937,6 +937,12 @@ body {
     flex-direction: column;
     gap: 1.5rem;
     align-items: center;
+}
+
+.primary-nav-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .external-links {
