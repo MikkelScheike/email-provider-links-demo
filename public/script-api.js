@@ -217,6 +217,7 @@ async function handleFormSubmit(event) {
     
     // Call the API to get the email details
     try {
+        console.log('Making API request...');
         const response = await fetch('/api/detect-provider', {
             method: 'POST',
             headers: {
@@ -225,16 +226,32 @@ async function handleFormSubmit(event) {
             body: JSON.stringify({ email })
         });
         
-        const result = await response.json();
+        console.log('Response received:', response.status);
+        const responseText = await response.text();
+        console.log('Response text:', responseText);
+        
+        let result;
+        try {
+            result = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('JSON parse error:', parseError);
+            throw new Error('Invalid JSON response');
+        }
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}, message: ${result.error || 'Unknown error'}`);
+        }
+        
         currentDetectedProvider = result;
         
         // Show the nice formatted results
         showInlineResults(email);
     } catch (error) {
+        console.error('Fetch error:', error);
         resultsSection.innerHTML = `
             <div class="results-card error">
                 <h3>Error:</h3>
-                <p>Failed to fetch email details.</p>
+                <p>${error.message || 'Failed to fetch email details.'}</p>
             </div>
         `;
     }

@@ -41,6 +41,11 @@ app.use(express.static(__dirname));
 
 // API endpoint for email provider detection
 app.post('/api/detect-provider', async (req, res) => {
+    // Add additional headers to help with in-app browsers
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
     try {
         const { email, timeout = 5000 } = req.body;
         
