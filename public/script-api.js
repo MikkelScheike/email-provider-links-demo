@@ -66,104 +66,9 @@ async function detectEmailProvider(email, timeout = 5000) {
     }
 }
 
-// Show provider detection UI
-function showProviderDetection(type, provider = null, detectionMethod = null, meta = null) {
-    let content = '';
-    
-    switch (type) {
-        case 'detecting':
-            content = `
-                <div class="provider-info detecting">
-                    <div class="provider-logo">🔍</div>
-                    <div class="provider-details">
-                        <div class="provider-name">Detecting email provider...</div>
-                        <div class="provider-subtitle">Using real DNS lookups</div>
-                    </div>
-                </div>
-            `;
-            break;
-            
-        case 'detected':
-            const logo = getProviderLogo(provider);
-            const isBusinessEmail = detectionMethod && detectionMethod !== 'domain_match';
-            const isProxy = isProxyService(provider);
-            
-            let cssClass = 'detected';
-            if (isProxy) {
-                cssClass = 'detected proxy';
-            } else if (isBusinessEmail) {
-                cssClass = 'detected business';
-            }
-            
-            let subtitle = 'Consumer email provider';
-            if (isProxy) {
-                subtitle = 'Email alias/proxy service';
-            } else if (isBusinessEmail) {
-                subtitle = 'Business email detected via ' + detectionMethod.replace('_', ' ');
-            }
-            
-            let methodDisplay = '';
-            if (detectionMethod && detectionMethod !== 'domain_match') {
-                methodDisplay = `<div class="detection-method">${detectionMethod.replace('_', ' ')}</div>`;
-            }
-            
-            // Add timing info if available
-            let timingInfo = '';
-            if (meta && meta.detectionTime) {
-                timingInfo = `<div class="detection-method">${meta.detectionTime}</div>`;
-            }
-            
-            content = `
-                <div class="provider-info ${cssClass}">
-                    <div class="provider-logo">${logo}</div>
-                    <div class="provider-details">
-                        <div class="provider-name">${provider.companyProvider}</div>
-                        <div class="provider-subtitle">${subtitle}</div>
-                    </div>
-                    ${methodDisplay}
-                    ${timingInfo}
-                </div>
-            `;
-            break;
-            
-        case 'not_found':
-            content = `
-                <div class="provider-info">
-                    <div class="provider-logo">❓</div>
-                    <div class="provider-details">
-                        <div class="provider-name">Unknown provider</div>
-                        <div class="provider-subtitle">Not found in library database</div>
-                    </div>
-                </div>
-            `;
-            break;
-            
-        case 'error':
-            content = `
-                <div class="provider-info" style="border-color: #ef4444; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);">
-                    <div class="provider-logo">⚠️</div>
-                    <div class="provider-details">
-                        <div class="provider-name">Detection failed</div>
-                        <div class="provider-subtitle">Network or server error</div>
-                    </div>
-                </div>
-            `;
-            break;
-    }
-    
-    providerDetection.innerHTML = content;
-}
-
 // Clear provider detection
 function clearProviderDetection() {
-    providerDetection.innerHTML = '';
     currentDetectedProvider = null;
-}
-
-// Clear provider detection UI only (preserve data state)
-function clearProviderDetectionUI() {
-    providerDetection.innerHTML = '';
-    // Don't clear currentDetectedProvider - we need it for results
 }
 
 // Clear results section
@@ -210,24 +115,16 @@ async function handleFormSubmit(event) {
     const email = emailInput.value.trim();
     if (!email) return;
     
-    // Clear any existing results first
+    // Clear previous state and hide provider detection
     clearResults();
+    providerDetection.style.display = 'none';
+    clearProviderDetection();
     
-    // Show loading state
+    // Show loading state only in the button
     signupBtn.classList.add('loading');
-    // Show detecting state without the searching message
-    providerDetection.innerHTML = `
-        <div class="provider-info detecting" style="opacity: 0.7">
-            <div class="provider-logo">🔍</div>
-            <div class="provider-details">
-                <div class="provider-name">Looking up provider</div>
-            </div>
-        </div>
-    `;
     
     // Call the API to get the email details
     try {
-        console.log('Making API request...');
         const response = await fetch('/api/detect-provider', {
             method: 'POST',
             headers: {
@@ -236,8 +133,6 @@ async function handleFormSubmit(event) {
             body: JSON.stringify({ email })
         });
         
-        console.log('Response received:', response.status);
-        
         if (!response.ok) {
             const errorText = await response.text();
             console.error('Server error:', errorText);
@@ -245,12 +140,12 @@ async function handleFormSubmit(event) {
         }
         
         const result = await response.json();
-        console.log('API Response:', result);
         
         // Store the result directly without normalization
         currentDetectedProvider = result;
         
-        // Show the results
+        // Show the results only when we have them
+        await new Promise(resolve => setTimeout(resolve, 100)); // Small delay for button animation
         showInlineResults(email);
         }
     } catch (error) {
@@ -273,17 +168,12 @@ function showInlineResults(email) {
         console.error('No provider data available');
         return;
     }
-
-    console.log('Showing results for provider:', currentDetectedProvider);
     
-    // Add smooth transition by fading out current content first
-    providerDetection.style.opacity = '0.5';
-    
-    // Small delay to allow fade effect, then update content
-    setTimeout(() => {
-        let content = '';
-    
-    if (currentDetectedProvider) {
+    // Hide any previous content
+    providerDetection.style.display = 'none';
+    let content = '';
+        
+        if (currentDetectedProvider) {
         const provider = {
             companyProvider: currentDetectedProvider.provider?.companyProvider || 'Unknown Provider'
         };
@@ -417,12 +307,7 @@ function showInlineResults(email) {
     }
     
         providerDetection.innerHTML = content;
-        
-        // Restore opacity after content update
-        providerDetection.style.opacity = '1';
-        
-        // No need to scroll since it's in the same place as the detection bar
-    }, 150); // Small delay for smooth transition
+        providerDetection.style.display = 'block';
 }
 
 // Open email inbox

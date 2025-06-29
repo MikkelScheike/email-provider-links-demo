@@ -66,23 +66,11 @@ async function getEmailProvider(email, timeout = 5000) {
     }
 }
 
-// Show provider detection UI
+// Show provider detection UI - simplified to only show final result
 function showProviderDetection(type, provider = null, detectionMethod = null, meta = null) {
     let content = '';
     
     switch (type) {
-        case 'detecting':
-            content = `
-                <div class="provider-info detecting">
-                    <div class="provider-logo">🔍</div>
-                    <div class="provider-details">
-                        <div class="provider-name">Detecting email provider...</div>
-                        <div class="provider-subtitle">Using real DNS lookups</div>
-                    </div>
-                </div>
-            `;
-            break;
-            
         case 'detected':
             const logo = getProviderLogo(provider);
             const isBusinessEmail = detectionMethod && detectionMethod !== 'domain_match';
@@ -212,9 +200,8 @@ async function handleFormSubmit(event) {
     clearProviderDetection();
     clearResults();
     
-    // Show loading state
+    // Show loading state only in the button
     signupBtn.classList.add('loading');
-    showProviderDetection('detecting');
     
     // Call the API to get the email details
     try {
