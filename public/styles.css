@@ -388,6 +388,17 @@ body {
     animation: slideIn 0.5s ease;
 }
 
+.results-icon, 
+.results-icon img, 
+.provider-icon, 
+.provider-icon.svg,
+.provider-icon.fallback {
+    background: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+}
+
 .results-header {
     display: flex;
     align-items: center;
@@ -395,13 +406,15 @@ body {
     margin-bottom: 1.5rem;
 }
 
-.results-icon {
+.results-icon, .results-icon img, .provider-icon, .provider-icon.svg {
     width: 48px;
     height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.8rem;
+    background: none !important;
+    box-shadow: none !important;
 }
 
 .results-title h3 {
