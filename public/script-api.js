@@ -194,11 +194,13 @@ function handleEmailChange() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         disableSubmitButton();
+        clearProviderDetection();
         return;
     }
     
     enableSubmitButton();
     clearResults();
+    clearProviderDetection();
 }
 
 // Handle form submission
@@ -209,11 +211,19 @@ async function handleFormSubmit(event) {
     if (!email) return;
     
     // Clear any existing results first
-    clearProviderDetection();
     clearResults();
     
     // Show loading state
     signupBtn.classList.add('loading');
+    // Show detecting state without the searching message
+    providerDetection.innerHTML = `
+        <div class="provider-info detecting" style="opacity: 0.7">
+            <div class="provider-logo">🔍</div>
+            <div class="provider-details">
+                <div class="provider-name">Looking up provider</div>
+            </div>
+        </div>
+    `;
     
     // Call the API to get the email details
     try {
