@@ -214,9 +214,11 @@ async function handleFormSubmit(event) {
     
     // Show loading state
     signupBtn.classList.add('loading');
+    showProviderDetection('detecting');
     
     // Call the API to get the email details
     try {
+        const startTime = Date.now();
         const response = await fetch('/api/detect-provider', {
             method: 'POST',
             headers: {
@@ -226,8 +228,14 @@ async function handleFormSubmit(event) {
         });
         
         const result = await response.json();
-    currentDetectedProvider = result;
-    if (meta) currentDetectedProvider._meta = meta;
+        currentDetectedProvider = result;
+        
+        // Add detection time metadata
+        const detectionTime = Date.now() - startTime;
+        currentDetectedProvider._meta = {
+            detectionTime: `${detectionTime}ms`,
+            apiVersion: '3.0.0'
+        };
         
         // Show the nice formatted results
         showInlineResults(email);
@@ -317,7 +325,7 @@ function showInlineResults(email) {
                             </div>
                             <div class="detail-row">
                                 <span class="detail-label">Detection Method:</span>
-                                <span class="detail-value">${currentDetectedProvider.detectionMethod || 'domain_match'}</span>
+                                <span class="detail-value">${formatDetectionMethod(currentDetectedProvider.detectionMethod || 'domain_match')}</span>
                             </div>
                             <div class="detail-row">
                                 <span class="detail-label">Login URL:</span>
@@ -449,6 +457,23 @@ function toggleRawResponse(button, event) {
         button.innerHTML = '<span class="toggle-icon">▶</span> View Full API Response';
         button.setAttribute('aria-expanded', 'false');
     }
+}
+
+// Format detection method strings
+function formatDetectionMethod(method) {
+    const methodMap = {
+        'domain_match': 'Domain Match',
+        'mx_record': 'MX Record Lookup',
+        'mx_match': 'MX Record Match',
+        'spf_record': 'SPF Record Lookup',
+        'spf_include': 'SPF Include Match',
+        'dmarc_record': 'DMARC Record Lookup',
+        'dns_match': 'DNS Record Match'
+    };
+    
+    return methodMap[method] || method.split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
 }
 
 // Make functions globally available

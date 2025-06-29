@@ -41,6 +41,8 @@ app.use(express.static(__dirname));
 
 // API endpoint for email provider detection
 app.post('/api/detect-provider', async (req, res) => {
+    // Add response headers
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
     // Add additional headers to help with in-app browsers
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Cache-Control', 'no-cache');
@@ -61,15 +63,10 @@ app.post('/api/detect-provider', async (req, res) => {
         
         console.log(`✅ Detection complete in ${detectionTime}ms:`, result);
         
-        // Add timing information for demo purposes
-        const response = {
-            ...result,
-            _meta: {
-                detectionTime: `${detectionTime}ms`,
-                timestamp: new Date().toISOString(),
-                apiVersion: '2.4.0'
-            }
-        };
+        // Return the result directly as provided by the library
+        const response = result;
+        
+        console.log('Final response being sent:', response);
         
         res.json(response);
     } catch (error) {

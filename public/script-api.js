@@ -8,7 +8,7 @@ const signupBtn = document.getElementById('signupBtn');
 const resultsSection = document.getElementById('resultsSection');
 
 // State
-let currentDetectedProvider = null;
+let currentDetectedResponse = null;
 
 // Check if a provider is a proxy/alias service
 function isProxyService(provider) {
@@ -227,25 +227,22 @@ async function handleFormSubmit(event) {
         });
         
         console.log('Response received:', response.status);
-        const responseText = await response.text();
-        console.log('Response text:', responseText);
-        
-        let result;
-        try {
-            result = JSON.parse(responseText);
-        } catch (parseError) {
-            console.error('JSON parse error:', parseError);
-            throw new Error('Invalid JSON response');
-        }
         
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}, message: ${result.error || 'Unknown error'}`);
+            const errorText = await response.text();
+            console.error('Server error:', errorText);
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         
+        const result = await response.json();
+        console.log('API Response:', result);
+        
+        // Store the result directly without normalization
         currentDetectedProvider = result;
         
-        // Show the nice formatted results
+        // Show the results
         showInlineResults(email);
+        }
     } catch (error) {
         console.error('Fetch error:', error);
         resultsSection.innerHTML = `
@@ -262,6 +259,13 @@ async function handleFormSubmit(event) {
 
 // Show inline results in the provider detection area
 function showInlineResults(email) {
+    if (!currentDetectedProvider) {
+        console.error('No provider data available');
+        return;
+    }
+
+    console.log('Showing results for provider:', currentDetectedProvider);
+    
     // Add smooth transition by fading out current content first
     providerDetection.style.opacity = '0.5';
     
@@ -269,9 +273,9 @@ function showInlineResults(email) {
     setTimeout(() => {
         let content = '';
     
-    if (currentDetectedProvider && (currentDetectedProvider.provider || currentDetectedProvider.proxyService)) {
-        const provider = currentDetectedProvider.provider || {
-            companyProvider: currentDetectedProvider.proxyService
+    if (currentDetectedProvider) {
+        const provider = {
+            companyProvider: currentDetectedProvider.provider?.companyProvider || 'Unknown Provider'
         };
         const logo = getProviderLogo(provider, 36);
         const isBusinessEmail = currentDetectedProvider.detectionMethod && 
