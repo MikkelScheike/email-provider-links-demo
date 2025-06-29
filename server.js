@@ -3,6 +3,19 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
+
+// Middleware to redirect HTTP to HTTPS
+const enforceHttps = (req, res, next) => {
+    // Check if we're in production (you might want to adjust this condition)
+    if (process.env.NODE_ENV === 'production') {
+        // Check if the request is already HTTPS or if it's from a proxy that used HTTPS
+        if (!req.secure && req.get('x-forwarded-proto') !== 'https') {
+            // Redirect to HTTPS
+            return res.redirect('https://' + req.get('host') + req.url);
+        }
+    }
+    next();
+};
 import { getEmailProvider } from '@mikkelscheike/email-provider-links';
 import * as simpleIcons from 'simple-icons';
 
@@ -13,7 +26,16 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+app.use(enforceHttps); // Add HTTPS enforcement before other middleware
+
+// Configure CORS with specific options
+app.use(cors({
+    origin: true, // Allow all origins
+    methods: ['GET', 'POST', 'OPTIONS'], // Explicitly allow methods
+    allowedHeaders: ['Content-Type'], // Allow Content-Type header
+    credentials: true // Allow credentials
+}));
+
 app.use(express.json());
 app.use(express.static(__dirname));
 

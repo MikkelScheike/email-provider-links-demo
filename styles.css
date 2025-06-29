@@ -58,19 +58,19 @@ body {
 /* Header */
 .demo-header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     color: white;
 }
 
 .demo-header h1 {
-    font-size: 3.9rem; /* Increased from 3rem by 30% */
+    font-size: 2.8rem;
     font-weight: 700;
-    margin-bottom: 1.3rem; /* Increased from 1rem by 30% */
-    text-shadow: 0 2.6px 5.2px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .demo-header p {
-    font-size: 1.56rem; /* Increased from 1.2rem by 30% */
+    font-size: 1.2rem;
     opacity: 0.9;
     font-weight: 400;
 }
@@ -79,9 +79,9 @@ body {
 .signup-card {
     background: white;
     border-radius: 20px;
-    padding: 3.9rem; /* Increased from 3rem by 30% */
-    box-shadow: 0 26px 52px rgba(0,0,0,0.1); /* Increased shadow to match new size */
-    margin-bottom: 3.9rem;
+    padding: 2rem;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
     margin-left: auto;
     margin-right: auto;
     width: 100%;
@@ -216,10 +216,10 @@ body {
 }
 
 .form-group input {
-    padding: 1.3rem;
+    padding: 1rem;
     border: 2px solid #e2e8f0;
-    border-radius: 15.6px;
-    font-size: 1.3rem;
+    border-radius: 12px;
+    font-size: 1.1rem;
     transition: all 0.2s ease;
     background: #f7fafc;
     width: 100%;
