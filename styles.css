@@ -18,24 +18,6 @@
     box-sizing: border-box;
 }
 
-/* Skip link for accessibility */
-.skip-link {
-    position: absolute;
-    top: -40px;
-    left: 6px;
-    background: #000;
-    color: #fff;
-    padding: 8px;
-    border-radius: 4px;
-    text-decoration: none;
-    z-index: 1000;
-    font-weight: 600;
-}
-
-.skip-link:focus {
-    top: 6px;
-}
-
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -243,7 +225,7 @@ body {
 }
 
 .input-button-row input {
-    flex: 1;
+    flex: 1 1 auto;
     width: 100%;
 }
 
@@ -608,7 +590,7 @@ body {
 /* Statistics Grid */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
     margin: 2rem 0;
 }
@@ -645,7 +627,7 @@ body {
 .features-comprehensive {
     margin-top: 2rem;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
 }
 
@@ -1061,7 +1043,7 @@ body {
     
     /* About page mobile responsiveness */
     .features-comprehensive {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: 1fr;
         gap: 1rem;
     }
     
