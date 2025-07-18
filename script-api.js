@@ -6,6 +6,7 @@ const emailInput = document.getElementById('email');
 const signupForm = document.getElementById('signupForm');
 const signupBtn = document.getElementById('signupBtn');
 const resultsSection = document.getElementById('resultsSection');
+const providerDetection = document.getElementById('providerDetection');
 
 // State
 let currentDetectedProvider = null;
@@ -226,8 +227,7 @@ async function handleFormSubmit(event) {
         });
         
         const result = await response.json();
-    currentDetectedProvider = result;
-    if (meta) currentDetectedProvider._meta = meta;
+        currentDetectedProvider = result;
         
         // Show the nice formatted results
         showInlineResults(email);
