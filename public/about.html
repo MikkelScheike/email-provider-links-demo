@@ -5,13 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Email Provider Links - Simplifying User Onboarding</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Favicon links -->
-    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
-    <link rel="manifest" href="favicons/site.webmanifest">
-<link rel="shortcut icon" href="/favicon.ico">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -29,9 +22,7 @@
             <!-- What is it? -->
             <section class="about-section">
                 <h2>What is Email Provider Links?</h2>
-                <p>Email Provider Links is a <strong>completely free and open source</strong> JavaScript/TypeScript library that automatically detects email providers and retrieves their login URLs. It helps create seamless user experiences by guiding users directly to their email inbox after registration or email verification.</p>
-                
-                <p><strong>100% Free Forever:</strong> No subscriptions, no usage limits, no hidden costs. Released under the MIT license, this library is built for developers by developers. Use it in personal projects, commercial applications, or enterprise software without any restrictions.</p>
+                <p>Email Provider Links is a <strong>completely free and open source</strong> JavaScript/TypeScript library that automatically detects email providers and retrieves their login URLs. It helps create seamless user experiences by guiding users directly to their email inbox after registration or email verification. <strong>100% Free Forever:</strong>
                 
                 <!-- Key Statistics -->
                 <div class="stats-grid">
@@ -44,11 +35,11 @@
                         <div class="stat-label">Email Providers</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">178</div>
+                        <div class="stat-number">207</div>
                         <div class="stat-label">Domains Supported</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">92.89%</div>
+                        <div class="stat-number">94.65%</div>
                         <div class="stat-label">Code Coverage</div>
                     </div>
                 </div>
@@ -77,6 +68,30 @@
                     </div>
                 </div>
                 
+                <!-- Why use it? -->
+                <h2 style="margin-top: 3rem;">Why Use Email Provider Links?</h2>
+                
+                <div class="problem-solution">
+                    <div class="problem">
+                        <h3>❌ The Problem</h3>
+                        <ul>
+                            <li>Users abandon registration flows when they can't find verification emails</li>
+                            <li>Generic "check your email" messages provide no helpful guidance</li>
+                            <li>Users don't know which email app to open or where to look</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="solution">
+                        <h3>✅ The Solution</h3>
+                        <ul>
+                            <li>Automatically detect the user's email provider</li>
+                            <li>Show provider-specific instructions and branding</li>
+                            <li>Provide direct "Go to Gmail" or "Check Outlook" buttons</li>
+                            <li>Reduce user confusion and improve completion rates</li>
+                        </ul>
+                    </div>
+                </div>
+
                 <!-- Comprehensive Features -->
                 <h2 style="margin-top: 3rem;">Benefits</h2>
                 <div class="features-comprehensive">
@@ -104,7 +119,7 @@
                     <div class="feature-item">
                         <span class="feature-emoji">🌐</span>
                         <div class="feature-content">
-                            <strong>178 Domains Supported:</strong> Comprehensive international coverage
+                            <strong>207 Domains Supported:</strong> Comprehensive international coverage
                         </div>
                     </div>
                     
@@ -174,36 +189,10 @@
                     <div class="feature-item">
                         <span class="feature-emoji">🧪</span>
                         <div class="feature-content">
-                            <strong>Thoroughly Tested:</strong> 370 tests with 92.89% code coverage
+                            <strong>Thoroughly Tested:</strong> 445 tests with 94.65% code coverage
                         </div>
                     </div>
                     
-                </div>
-            </section>
-
-            <!-- Why use it? -->
-            <section class="about-section">
-                <h2>Why Use Email Provider Links?</h2>
-                
-                <div class="problem-solution">
-                    <div class="problem">
-                        <h3>❌ The Problem</h3>
-                        <ul>
-                            <li>Users abandon registration flows when they can't find verification emails</li>
-                            <li>Generic "check your email" messages provide no helpful guidance</li>
-                            <li>Users don't know which email app to open or where to look</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="solution">
-                        <h3>✅ The Solution</h3>
-                        <ul>
-                            <li>Automatically detect the user's email provider</li>
-                            <li>Show provider-specific instructions and branding</li>
-                            <li>Provide direct "Go to Gmail" or "Check Outlook" buttons</li>
-                            <li>Reduce user confusion and improve completion rates</li>
-                        </ul>
-                    </div>
                 </div>
             </section>
 
@@ -309,7 +298,7 @@
                         <h3>🛠️ Basic Usage</h3>
                         <pre><code>import { detectEmailProvider } from '@mikkelscheike/email-provider-links';
 
-const result = await detectEmailProvider('user@gmail.com');
+const result = await getEmailProvider('user@gmail.com');
 console.log(result);
 // {
 //   provider: {
@@ -349,7 +338,10 @@ console.log(result);
 
             <!-- Navigation -->
             <div class="navigation-section">
-                <a href="/" class="nav-button primary">← Try the Demo</a>
+                <div class="primary-nav-buttons">
+                    <a href="/" class="nav-button primary">← Try the Demo</a>
+                    <a href="#top" class="nav-button primary">↑ Back to Top</a>
+                </div>
                 <div class="external-links">
                     <a href="https://github.com/MikkelScheike/email-provider-links" target="_blank" class="nav-button">
                         📚 Documentation

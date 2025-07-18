@@ -44,7 +44,7 @@ function getProviderLogo(provider, size = 24) {
 }
 
 // Call the API to detect email provider
-async function detectEmailProvider(email, timeout = 5000) {
+async function getEmailProvider(email, timeout = 5000) {
     try {
         const response = await fetch('/api/detect-provider', {
             method: 'POST',
@@ -226,7 +226,8 @@ async function handleFormSubmit(event) {
         });
         
         const result = await response.json();
-        currentDetectedProvider = result;
+    currentDetectedProvider = result;
+    if (meta) currentDetectedProvider._meta = meta;
         
         // Show the nice formatted results
         showInlineResults(email);
