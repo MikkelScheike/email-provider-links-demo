@@ -1,5 +1,7 @@
 # Email Provider Links Demo
 
+![npm](https://img.shields.io/npm/v/@mikkelscheike/email-provider-links)
+
 A beautiful, interactive demo showcasing the power of the `@mikkelscheike/email-provider-links` library. This demo features a modern signup form with real-time email provider detection and direct inbox linking.
 
 ## 🚀 Features
