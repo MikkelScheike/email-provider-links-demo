@@ -108,6 +108,23 @@ body {
     opacity: 0.8;
 }
 
+/* NPM Badge */
+.npm-badge-container {
+    margin: 1rem 0 0.5rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.npm-badge {
+    border-radius: 4px;
+    height: 20px;
+    transition: transform 0.2s ease;
+}
+
+.npm-badge:hover {
+    transform: scale(1.05);
+}
+
 /* Repository Links */
 .repo-links {
     margin-top: 1.5rem;
