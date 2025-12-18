@@ -9,6 +9,10 @@ const resultsSection = document.getElementById('resultsSection');
 const providerDetection = document.getElementById('providerDetection');
 const modeToggle = document.getElementById('modeToggle');
 
+if (signupForm) {
+    signupForm.setAttribute('novalidate', 'novalidate');
+}
+
 // State
 let currentDetectedProvider = null;
 let lastApiDebug = null;
@@ -226,14 +230,37 @@ function enableSubmitButton(text = 'See result') {
     signupBtn.querySelector('.btn-text').textContent = text;
 }
 
+function isValidEmailForDemo(email) {
+    if (!email) return false;
+
+    if (emailInput && typeof emailInput.checkValidity === 'function') {
+        if (!emailInput.checkValidity()) return false;
+    } else {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) return false;
+    }
+
+    if (email.includes('..')) return false;
+
+    const parts = email.split('@');
+    if (parts.length !== 2) return false;
+    const local = parts[0];
+    const domain = parts[1];
+
+    if (!local || !domain) return false;
+    if (local.startsWith('.') || local.endsWith('.')) return false;
+    if (domain.startsWith('.') || domain.endsWith('.')) return false;
+
+    return true;
+}
+
 // Handle email input changes
 function handleEmailChange() {
     const email = emailInput.value.trim();
     
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        disableSubmitButton();
+    if (!isValidEmailForDemo(email)) {
+        disableSubmitButton('Enter a valid email');
+        clearResults();
         return;
     }
     
@@ -247,6 +274,22 @@ async function handleFormSubmit(event) {
     
     const email = emailInput.value.trim();
     if (!email) return;
+
+    if (!isValidEmailForDemo(email)) {
+        signupBtn.classList.remove('loading');
+        clearProviderDetection();
+        clearResults();
+        providerDetection.innerHTML = `
+            <div class="provider-info" style="border-color: #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);">
+                <div class="provider-logo">✉️</div>
+                <div class="provider-details">
+                    <div class="provider-name">Invalid email address</div>
+                    <div class="provider-subtitle">Please check the formatting and try again</div>
+                </div>
+            </div>
+        `;
+        return;
+    }
     
     // Clear any existing results first
     clearProviderDetection();
@@ -443,6 +486,42 @@ function showInlineResults(email) {
         };
         
         const resultData = JSON.stringify(displayResult, null, 2);
+
+        let behindTheScenesPanel = '';
+        if (behindTheScenesMode) {
+            const debugData = lastApiDebug ? JSON.stringify({
+                url: lastApiDebug.url,
+                method: lastApiDebug.method,
+                status: lastApiDebug.status,
+                ok: lastApiDebug.ok,
+                durationMs: lastApiDebug.durationMs,
+                requestBody: lastApiDebug.requestBody
+            }, null, 2) : null;
+
+            behindTheScenesPanel = `
+                <div class="debug-panel" aria-label="Behind the scenes">
+                    <div class="debug-panel-title">Behind the scenes</div>
+                    ${lastApiDebug ? `
+                        <div class="debug-grid">
+                            <div class="debug-item">
+                                <div class="debug-label">Request</div>
+                                <pre class="debug-pre">${debugData}</pre>
+                            </div>
+                            <div class="debug-item">
+                                <div class="debug-label">Raw response</div>
+                                <pre class="debug-pre">${resultData}</pre>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${currentDetectedProvider && currentDetectedProvider._meta ? `
+                        <div class="debug-meta">
+                            <span><strong>Detection Time:</strong> ${currentDetectedProvider._meta.detectionTime || 'n/a'}</span>
+                            <span><strong>Library Version:</strong> ${currentDetectedProvider._meta.libraryVersion || 'n/a'}</span>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
         
         content = `
             <div class="results-card unknown">
@@ -455,11 +534,7 @@ function showInlineResults(email) {
                 </div>
                 <div class="results-content">
                     <p>Your email <strong>${email}</strong> is from an unknown provider, but we'll still send the verification email!</p>
-                    
-                    <div class="detection-details">
-                        <h4>Library Response Data:</h4>
-                        <pre>${resultData}</pre>
-                    </div>
+                    ${behindTheScenesMode ? behindTheScenesPanel : ''}
                 </div>
                 <button class="inbox-button disabled" disabled>
                     Please check your email application
