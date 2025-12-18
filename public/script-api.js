@@ -7,9 +7,48 @@ const signupForm = document.getElementById('signupForm');
 const signupBtn = document.getElementById('signupBtn');
 const resultsSection = document.getElementById('resultsSection');
 const providerDetection = document.getElementById('providerDetection');
+const modeToggle = document.getElementById('modeToggle');
 
 // State
 let currentDetectedProvider = null;
+let lastApiDebug = null;
+let behindTheScenesMode = false;
+let modeToggleInitialized = false;
+
+function setMode(isBehindTheScenes) {
+    behindTheScenesMode = Boolean(isBehindTheScenes);
+    document.body.classList.toggle('mode-bts', behindTheScenesMode);
+    try {
+        localStorage.setItem('demoMode', behindTheScenesMode ? 'bts' : 'live');
+    } catch {
+        // ignore
+    }
+
+    if (currentDetectedProvider) {
+        showInlineResults(emailInput.value.trim());
+    }
+}
+
+function initModeToggle() {
+    if (modeToggleInitialized) return;
+    modeToggleInitialized = true;
+    if (!modeToggle) return;
+
+    let stored = null;
+    try {
+        stored = localStorage.getItem('demoMode');
+    } catch {
+        stored = null;
+    }
+
+    const initialIsBts = stored === 'bts';
+    modeToggle.checked = initialIsBts;
+    setMode(initialIsBts);
+
+    modeToggle.addEventListener('change', () => {
+        setMode(modeToggle.checked);
+    });
+}
 
 // Check if a provider is a proxy/alias service
 function isProxyService(provider) {
@@ -218,20 +257,45 @@ async function handleFormSubmit(event) {
     
     // Call the API to get the email details
     try {
+        const requestBody = { email };
+        const start = performance.now();
         const response = await fetch('/api/detect-provider', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email })
+            body: JSON.stringify(requestBody)
         });
-        
-        const result = await response.json();
+
+        const durationMs = Math.round(performance.now() - start);
+        const responseText = await response.text();
+        const result = responseText ? JSON.parse(responseText) : null;
+
+        lastApiDebug = {
+            url: '/api/detect-provider',
+            method: 'POST',
+            requestBody,
+            status: response.status,
+            ok: response.ok,
+            durationMs,
+            responseText
+        };
+
         currentDetectedProvider = result;
         
         // Show the nice formatted results
         showInlineResults(email);
     } catch (error) {
+        lastApiDebug = {
+            url: '/api/detect-provider',
+            method: 'POST',
+            requestBody: { email },
+            status: null,
+            ok: false,
+            durationMs: null,
+            responseText: null,
+            error: error && error.message ? error.message : String(error)
+        };
         resultsSection.innerHTML = `
             <div class="results-card error">
                 <h3>Error:</h3>
@@ -269,19 +333,40 @@ function showInlineResults(email) {
             cardClass = 'business';
         }
         
-        // Format the full result object for display (clean up the response for display)
-        const displayResult = { ...currentDetectedProvider };
-        delete displayResult._meta; // Remove meta from main display
-        
-        const resultData = JSON.stringify(displayResult, null, 2);
-        
-        // Add meta information separately
-        let metaInfo = '';
-        if (currentDetectedProvider._meta) {
-            metaInfo = `
-                <div style="margin-top: 1rem; padding: 0.5rem; background: rgba(0,0,0,0.05); border-radius: 6px; font-size: 0.8rem;">
-                    <strong>Detection Time:</strong> ${currentDetectedProvider._meta.detectionTime} | 
-                    <strong>API Version:</strong> ${currentDetectedProvider._meta.apiVersion}
+        const resultData = JSON.stringify(currentDetectedProvider, null, 2);
+
+        let behindTheScenesPanel = '';
+        if (behindTheScenesMode) {
+            const debugData = lastApiDebug ? JSON.stringify({
+                url: lastApiDebug.url,
+                method: lastApiDebug.method,
+                status: lastApiDebug.status,
+                ok: lastApiDebug.ok,
+                durationMs: lastApiDebug.durationMs,
+                requestBody: lastApiDebug.requestBody
+            }, null, 2) : null;
+
+            behindTheScenesPanel = `
+                <div class="debug-panel" aria-label="Behind the scenes">
+                    <div class="debug-panel-title">Behind the scenes</div>
+                    ${lastApiDebug ? `
+                        <div class="debug-grid">
+                            <div class="debug-item">
+                                <div class="debug-label">Request</div>
+                                <pre class="debug-pre">${debugData}</pre>
+                            </div>
+                            <div class="debug-item">
+                                <div class="debug-label">Raw response</div>
+                                <pre class="debug-pre">${resultData}</pre>
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${currentDetectedProvider && currentDetectedProvider._meta ? `
+                        <div class="debug-meta">
+                            <span><strong>Detection Time:</strong> ${currentDetectedProvider._meta.detectionTime || 'n/a'}</span>
+                            <span><strong>Library Version:</strong> ${currentDetectedProvider._meta.libraryVersion || 'n/a'}</span>
+                        </div>
+                    ` : ''}
                 </div>
             `;
         }
@@ -307,39 +392,36 @@ function showInlineResults(email) {
                     ` : `
                         <p>Your email <strong>${email}</strong> is hosted with <strong>${provider.companyProvider}</strong>.</p>
                     `}
-                    
-                    <div class="detection-details">
-                        <h4>Detection Details:</h4>
-                        <div class="detection-summary">
-                            <div class="detail-row">
-                                <span class="detail-label">Provider:</span>
-                                <span class="detail-value">${provider.companyProvider}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Detection Method:</span>
-                                <span class="detail-value">${currentDetectedProvider.detectionMethod || 'domain_match'}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Login URL:</span>
-                                <span class="detail-value">${currentDetectedProvider.loginUrl || 'Not available'}</span>
-                            </div>
-                            ${currentDetectedProvider._meta ? `
+                    ${behindTheScenesMode ? `
+                        <div class="detection-details">
+                            <h4>Detection Details:</h4>
+                            <div class="detection-summary">
                                 <div class="detail-row">
-                                    <span class="detail-label">Detection Time:</span>
-                                    <span class="detail-value">${currentDetectedProvider._meta.detectionTime}</span>
+                                    <span class="detail-label">Provider:</span>
+                                    <span class="detail-value">${provider.companyProvider}</span>
                                 </div>
-                            ` : ''}
-                        </div>
-                        
-                        <div class="raw-response-toggle">
-<button class="toggle-btn" onclick="toggleRawResponse(this, event)" aria-expanded="false" aria-controls="raw-response-content">
-                                <span class="toggle-icon">▶</span> View Full API Response
-                            </button>
-                            <div class="raw-response hide" id="raw-response-content">
-                                <pre>${resultData}</pre>
+                                <div class="detail-row">
+                                    <span class="detail-label">Detection Method:</span>
+                                    <span class="detail-value">${currentDetectedProvider.detectionMethod || 'domain_match'}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Login URL:</span>
+                                    <span class="detail-value">${currentDetectedProvider.loginUrl || 'Not available'}</span>
+                                </div>
+                                ${currentDetectedProvider._meta ? `
+                                    <div class="detail-row">
+                                        <span class="detail-label">Detection Time:</span>
+                                        <span class="detail-value">${currentDetectedProvider._meta.detectionTime}</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Library Version:</span>
+                                        <span class="detail-value">${currentDetectedProvider._meta.libraryVersion || 'n/a'}</span>
+                                    </div>
+                                ` : ''}
                             </div>
                         </div>
-                    </div>
+                        ${behindTheScenesPanel}
+                    ` : ''}
                 </div>
                 ${currentDetectedProvider.loginUrl ? `
 <button class="inbox-button" onclick="openEmailInbox(event)">
@@ -408,6 +490,7 @@ function openEmailInbox(event) {
 
 // Clear form on page load
 function clearFormOnLoad() {
+    initModeToggle();
     emailInput.value = '';
     clearProviderDetection();
     clearResults();
@@ -426,34 +509,8 @@ window.addEventListener('load', clearFormOnLoad);
 // Also clear on DOMContentLoaded as backup
 document.addEventListener('DOMContentLoaded', clearFormOnLoad);
 
-// Toggle raw response display
-function toggleRawResponse(button, event) {
-    // Prevent the click from triggering form submission
-    event.preventDefault();
-    event.stopPropagation();
-    
-    const rawResponse = button.parentElement.querySelector('.raw-response');
-    const icon = button.querySelector('.toggle-icon');
-    const isExpanded = button.getAttribute('aria-expanded') === 'true';
-    
-    if (!isExpanded) {
-        rawResponse.classList.remove('hide');
-        rawResponse.classList.add('show');
-        icon.textContent = '▼';
-        button.innerHTML = '<span class="toggle-icon">▼</span> Hide Full API Response';
-        button.setAttribute('aria-expanded', 'true');
-    } else {
-        rawResponse.classList.remove('show');
-        rawResponse.classList.add('hide');
-        icon.textContent = '▶';
-        button.innerHTML = '<span class="toggle-icon">▶</span> View Full API Response';
-        button.setAttribute('aria-expanded', 'false');
-    }
-}
-
 // Make functions globally available
 window.openEmailInbox = openEmailInbox;
-window.toggleRawResponse = toggleRawResponse;
 
 // Demo: Add some example emails for testing
 console.log('🚀 Email Provider Links Demo loaded with REAL library API!');

@@ -48,6 +48,18 @@ body {
     padding: 2rem;
 }
 
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(1000px 500px at 20% 10%, rgba(255,255,255,0.18), transparent 60%),
+        radial-gradient(900px 480px at 80% 20%, rgba(255,255,255,0.12), transparent 60%),
+        radial-gradient(900px 520px at 40% 95%, rgba(0,0,0,0.08), transparent 55%);
+    opacity: 0.9;
+}
+
 .container {
     width: 100%;
     max-width: 1200px;
@@ -106,6 +118,81 @@ body {
     font-weight: 400;
     margin: 0;
     opacity: 0.8;
+}
+
+.mode-switch {
+    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.10) 0%, rgba(118, 75, 162, 0.10) 100%);
+    border: 1px solid rgba(102, 126, 234, 0.18);
+    border-radius: 999px;
+}
+
+.mode-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4a5568;
+    user-select: none;
+}
+
+body.mode-bts .mode-label[data-mode="bts"] {
+    color: #1f2937;
+}
+
+body:not(.mode-bts) .mode-label[data-mode="live"] {
+    color: #1f2937;
+}
+
+.switch {
+    position: relative;
+    display: inline-flex;
+    width: 48px;
+    height: 28px;
+    align-items: center;
+}
+
+.switch input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.switch-track {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.55);
+    border: 1px solid rgba(148, 163, 184, 0.7);
+    transition: all 0.2s ease;
+}
+
+.switch-thumb {
+    position: absolute;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: white;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+    transition: transform 0.2s ease;
+}
+
+.switch input:checked ~ .switch-track {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: rgba(102, 126, 234, 0.65);
+}
+
+.switch input:checked ~ .switch-thumb {
+    transform: translateX(20px);
+}
+
+.switch input:focus-visible ~ .switch-track {
+    outline: 3px solid rgba(102, 126, 234, 0.35);
+    outline-offset: 2px;
 }
 
 /* NPM Badge */
@@ -363,6 +450,72 @@ body {
     border-radius: 16px;
     padding: 2rem;
     animation: slideIn 0.5s ease;
+}
+
+.debug-panel {
+    margin-top: 1rem;
+    background: linear-gradient(135deg, #0b1220 0%, #111827 100%);
+    color: #e5e7eb;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 14px;
+    padding: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+.debug-panel-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    margin-bottom: 0.75rem;
+}
+
+.debug-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .debug-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.debug-item {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 0.75rem;
+}
+
+.debug-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(229, 231, 235, 0.75);
+    margin-bottom: 0.5rem;
+}
+
+.debug-pre {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 10px;
+    padding: 0.75rem;
+    font-size: 0.8rem;
+    line-height: 1.35;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    margin: 0;
+}
+
+.debug-meta {
+    margin-top: 0.75rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: rgba(229, 231, 235, 0.85);
 }
 
 .results-header {
@@ -1029,6 +1182,33 @@ body {
     .signup-card {
         padding: 1.5rem;
         margin-bottom: 1.5rem;
+    }
+
+    .mode-switch {
+        max-width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.65rem;
+    }
+
+    .mode-label {
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+    .switch {
+        width: 52px;
+        height: 30px;
+    }
+
+    .switch-thumb {
+        width: 24px;
+        height: 24px;
+    }
+
+    .switch input:checked ~ .switch-thumb {
+        transform: translateX(22px);
     }
     
 /* Keep input and button centered on mobile */

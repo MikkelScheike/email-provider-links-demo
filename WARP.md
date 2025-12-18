@@ -30,7 +30,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 - Server (Express) — `server.js`
   - Static files: `app.use(express.static(__dirname))` serves repository-root assets (e.g., `index.html`, `styles.css`, `script-api.js`).
   - API endpoints
-    - `POST /api/detect-provider` — calls `getEmailProvider(email, timeout)` from `@mikkelscheike/email-provider-links`, measures detection time, and returns the library result plus a `_meta` block `{ detectionTime, timestamp, apiVersion }`.
+    - `POST /api/detect-provider` — calls `getEmailProvider(email, timeout)` from `@mikkelscheike/email-provider-links`, measures detection time, and returns the library result plus a `_meta` block `{ detectionTime, timestamp, libraryVersion }`.
     - `GET /api/icon/:iconName` — returns SVGs. Uses a custom `microsoftoutlook.svg` when iconName is `outlook`/`microsoft`; otherwise maps common names to `simple-icons`. Optional `?color=RRGGBB`. Responses are cached (`Cache-Control: public, max-age=86400`).
     - `GET /api/health` — simple health probe used by Render.
   - Page route: `GET /` sends `index.html`.

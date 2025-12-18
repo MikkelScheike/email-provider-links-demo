@@ -28,7 +28,7 @@
     "url": "https://github.com/MikkelScheike/email-provider-links-demo/issues"
   },
   "dependencies": {
-    "@mikkelscheike/email-provider-links": "^4.0.9",
+    "@mikkelscheike/email-provider-links": "^5.0.0",
     "express": "^5.2.1",
     "simple-icons": "^16.0.0"
   },
