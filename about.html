@@ -296,7 +296,7 @@
                     
                     <div class="usage-section">
                         <h3>🛠️ Basic Usage</h3>
-                        <pre><code>import { detectEmailProvider } from '@mikkelscheike/email-provider-links';
+                        <pre><code>import { getEmailProvider } from '@mikkelscheike/email-provider-links';
 
 const result = await getEmailProvider('user@gmail.com');
 console.log(result);
@@ -306,9 +306,14 @@ console.log(result);
 //     loginUrl: 'https://mail.google.com/mail/'
 //   },
 //   email: 'user@gmail.com',
-//   loginUrl: 'https://mail.google.com/mail/',
 //   detectionMethod: 'domain_match'
-// }</code></pre>
+// }
+
+// With options (timeout and extended flag)
+const resultExtended = await getEmailProvider('user@gmail.com', {
+  timeout: 5000,
+  extended: true
+});</code></pre>
                     </div>
                 </div>
             </section>
