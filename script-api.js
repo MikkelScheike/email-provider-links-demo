@@ -8,6 +8,7 @@ const signupBtn = document.getElementById('signupBtn');
 const resultsSection = document.getElementById('resultsSection');
 const providerDetection = document.getElementById('providerDetection');
 const modeToggle = document.getElementById('modeToggle');
+const extendedToggle = document.getElementById('extendedToggle');
 
 if (signupForm) {
     signupForm.setAttribute('novalidate', 'novalidate');
@@ -17,7 +18,10 @@ if (signupForm) {
 let currentDetectedProvider = null;
 let lastApiDebug = null;
 let behindTheScenesMode = false;
+let extendedMode = false;
 let modeToggleInitialized = false;
+let extendedToggleInitialized = false;
+let resultCache = {}; // Cache for results: { email: { standard: result, extended: result } }
 
 function setMode(isBehindTheScenes) {
     behindTheScenesMode = Boolean(isBehindTheScenes);
@@ -28,9 +32,71 @@ function setMode(isBehindTheScenes) {
         // ignore
     }
 
+    // Disable/enable extended toggle based on behind the scenes mode
+    if (extendedToggle) {
+        extendedToggle.disabled = !behindTheScenesMode;
+        const extendedSwitch = extendedToggle.closest('.mode-switch');
+        if (extendedSwitch) {
+            extendedSwitch.classList.toggle('disabled', !behindTheScenesMode);
+        }
+    }
+
     if (currentDetectedProvider) {
         showInlineResults(emailInput.value.trim());
     }
+}
+
+function setExtendedMode(isExtended) {
+    const wasExtended = extendedMode;
+    extendedMode = Boolean(isExtended);
+    document.body.classList.toggle('extended', extendedMode);
+    
+    try {
+        localStorage.setItem('extendedMode', extendedMode ? 'true' : 'false');
+    } catch {
+        // ignore
+    }
+
+    // If we have a cached result for the current email with the new extended state, use it
+    const email = emailInput.value.trim();
+    if (email && resultCache[email]) {
+        const cachedResult = resultCache[email][extendedMode ? 'extended' : 'standard'];
+        if (cachedResult) {
+            currentDetectedProvider = cachedResult.result;
+            lastApiDebug = cachedResult.debug;
+            showInlineResults(email);
+            return;
+        }
+    }
+
+    // If we have a result but it's for a different extended state, rerun the API call
+    if (email && currentDetectedProvider && wasExtended !== extendedMode) {
+        handleFormSubmit(new Event('submit'));
+    } else if (currentDetectedProvider) {
+        showInlineResults(email);
+    }
+}
+
+function initExtendedToggle() {
+    if (extendedToggleInitialized) return;
+    extendedToggleInitialized = true;
+    if (!extendedToggle) return;
+
+    let stored = null;
+    try {
+        stored = localStorage.getItem('extendedMode');
+    } catch {
+        stored = null;
+    }
+
+    const initialIsExtended = stored === 'true';
+    extendedToggle.checked = initialIsExtended;
+    extendedMode = initialIsExtended; // Set state before calling setExtendedMode
+    setExtendedMode(initialIsExtended);
+
+    extendedToggle.addEventListener('change', () => {
+        setExtendedMode(extendedToggle.checked);
+    });
 }
 
 function initModeToggle() {
@@ -59,6 +125,16 @@ function isProxyService(provider) {
     if (!provider || !provider.companyProvider) return false;
     const proxyServices = ['SimpleLogin', 'AnonAddy', 'Firefox Relay', 'DuckDuckGo', 'Hide My Email', 'Relay', 'Alias', 'Cloudflare'];
     return proxyServices.some(service => provider.companyProvider.toLowerCase().includes(service.toLowerCase()));
+}
+
+// Get loginUrl from result - handles both extended and standard response formats
+function getLoginUrl(result) {
+    if (!result) return null;
+    // Primary: loginUrl is under provider
+    if (result.provider && result.provider.loginUrl) return result.provider.loginUrl;
+    // Fallback: loginUrl is at top level (extended mode)
+    if (result.loginUrl) return result.loginUrl;
+    return null;
 }
 
 // Get provider logo
@@ -298,9 +374,23 @@ async function handleFormSubmit(event) {
     // Show loading state
     signupBtn.classList.add('loading');
     
+    // Check cache first
+    const cacheKey = extendedMode ? 'extended' : 'standard';
+    if (resultCache[email] && resultCache[email][cacheKey]) {
+        const cached = resultCache[email][cacheKey];
+        currentDetectedProvider = cached.result;
+        lastApiDebug = cached.debug;
+        showInlineResults(email);
+        signupBtn.classList.remove('loading');
+        return;
+    }
+
     // Call the API to get the email details
     try {
-        const requestBody = { email };
+        const requestBody = { 
+            email,
+            extended: extendedMode // Use extended flag from toggle
+        };
         const start = performance.now();
         const response = await fetch('/api/detect-provider', {
             method: 'POST',
@@ -322,6 +412,15 @@ async function handleFormSubmit(event) {
             ok: response.ok,
             durationMs,
             responseText
+        };
+
+        // Cache the result
+        if (!resultCache[email]) {
+            resultCache[email] = {};
+        }
+        resultCache[email][cacheKey] = {
+            result: result,
+            debug: lastApiDebug
         };
 
         currentDetectedProvider = result;
@@ -449,7 +548,7 @@ function showInlineResults(email) {
                                 </div>
                                 <div class="detail-row">
                                     <span class="detail-label">Login URL:</span>
-                                    <span class="detail-value">${currentDetectedProvider.loginUrl || 'Not available'}</span>
+                                    <span class="detail-value">${getLoginUrl(currentDetectedProvider) || 'Not available'}</span>
                                 </div>
                                 ${currentDetectedProvider._meta ? `
                                     <div class="detail-row">
@@ -466,7 +565,7 @@ function showInlineResults(email) {
                         ${behindTheScenesPanel}
                     ` : ''}
                 </div>
-                ${currentDetectedProvider.loginUrl ? `
+                ${getLoginUrl(currentDetectedProvider) ? `
 <button class="inbox-button" onclick="openEmailInbox(event)">
                         Go to your ${provider.companyProvider} inbox →
                     </button>
@@ -558,14 +657,24 @@ function openEmailInbox(event) {
     event.preventDefault();
     event.stopPropagation();
     
-    if (currentDetectedProvider && currentDetectedProvider.loginUrl) {
-        window.open(currentDetectedProvider.loginUrl, '_blank');
+    const loginUrl = getLoginUrl(currentDetectedProvider);
+    if (loginUrl) {
+        window.open(loginUrl, '_blank');
     }
 }
 
 // Clear form on page load
 function clearFormOnLoad() {
     initModeToggle();
+    initExtendedToggle();
+    // Set initial disabled state for extended toggle based on behind the scenes mode
+    if (extendedToggle) {
+        extendedToggle.disabled = !behindTheScenesMode;
+        const extendedSwitch = extendedToggle.closest('.mode-switch');
+        if (extendedSwitch) {
+            extendedSwitch.classList.toggle('disabled', !behindTheScenesMode);
+        }
+    }
     emailInput.value = '';
     clearProviderDetection();
     clearResults();

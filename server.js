@@ -33,16 +33,16 @@ app.use(express.static(__dirname));
 // API endpoint for email provider detection
 app.post('/api/detect-provider', async (req, res) => {
     try {
-        const { email, timeout = 5000 } = req.body;
+        const { email, timeout = 5000, extended = false } = req.body;
         
         if (!email) {
             return res.status(400).json({ error: 'Email is required' });
         }
 
-        console.log(`🔍 Detecting provider for: ${email}`);
+        console.log(`🔍 Detecting provider for: ${email}${extended ? ' (extended mode)' : ''}`);
         
         const startTime = Date.now();
-        const result = await getEmailProvider(email, timeout);
+        const result = await getEmailProvider(email, { timeout, extended });
         const detectionTime = Date.now() - startTime;
         
         console.log(`✅ Detection complete in ${detectionTime}ms:`, result);
@@ -53,7 +53,8 @@ app.post('/api/detect-provider', async (req, res) => {
             _meta: {
                 detectionTime: `${detectionTime}ms`,
                 timestamp: new Date().toISOString(),
-                libraryVersion: emailProviderLinksVersion
+                libraryVersion: emailProviderLinksVersion,
+                extended: extended
             }
         };
         

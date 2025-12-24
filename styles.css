@@ -127,6 +127,21 @@ body::before {
     background: #f5f5f7;
     border: 0.5px solid rgba(0, 0, 0, 0.1);
     border-radius: 999px;
+    transition: opacity 0.2s ease;
+}
+
+.mode-switch.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.mode-switch.disabled .switch {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.mode-switch.disabled .mode-label {
+    opacity: 0.5;
 }
 
 .mode-label {
@@ -142,6 +157,14 @@ body.mode-bts .mode-label[data-mode="bts"] {
 }
 
 body:not(.mode-bts) .mode-label[data-mode="live"] {
+    color: #1d1d1f;
+}
+
+body.extended .mode-label[data-mode="extended"] {
+    color: #1d1d1f;
+}
+
+body:not(.extended) .mode-label[data-mode="standard"] {
     color: #1d1d1f;
 }
 
@@ -1444,11 +1467,23 @@ body:not(.mode-bts) .mode-label[data-mode="live"] {
         border: 0.5px solid rgba(255, 255, 255, 0.15);
     }
 
+    .mode-switch.disabled {
+        opacity: 0.4;
+    }
+
     body.mode-bts .mode-label[data-mode="bts"] {
         color: #f5f5f7;
     }
 
     body:not(.mode-bts) .mode-label[data-mode="live"] {
+        color: #f5f5f7;
+    }
+
+    body.extended .mode-label[data-mode="extended"] {
+        color: #f5f5f7;
+    }
+
+    body:not(.extended) .mode-label[data-mode="standard"] {
         color: #f5f5f7;
     }
 
