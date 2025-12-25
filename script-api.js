@@ -580,7 +580,12 @@ function showInlineResults(email) {
             </div>
         `;
     } else {
-        // Handle unknown provider case
+        // Check if there's an error in the response
+        const hasError = currentDetectedProvider && currentDetectedProvider.error;
+        const errorType = hasError ? currentDetectedProvider.error.type : null;
+        const errorMessage = hasError ? currentDetectedProvider.error.message : null;
+        
+        // Handle error or unknown provider case
         const displayResult = currentDetectedProvider || {
             provider: null,
             email: email,
@@ -625,24 +630,47 @@ function showInlineResults(email) {
             `;
         }
         
-        content = `
-            <div class="results-card unknown">
-                <div class="results-header">
-                    <div class="results-icon">❓</div>
-                    <div class="results-title">
-                        <h3>Found Your Email Provider</h3>
-                        <p>Email provider: Unknown</p>
+        // Show error message if there's an error, otherwise show unknown provider
+        if (hasError) {
+            content = `
+                <div class="results-card unknown">
+                    <div class="results-header">
+                        <div class="results-icon">⚠️</div>
+                        <div class="results-title">
+                            <h3>Email Validation Error</h3>
+                            <p>${errorType || 'Error'}</p>
+                        </div>
                     </div>
+                    <div class="results-content">
+                        <p><strong>${errorMessage || 'Invalid email address'}</strong></p>
+                        <p style="margin-top: 0.5rem; color: #86868b; font-size: 0.9375rem;">Please check your email address and try again.</p>
+                        ${behindTheScenesMode ? behindTheScenesPanel : ''}
+                    </div>
+                    <button class="inbox-button disabled" disabled>
+                        Invalid email address
+                    </button>
                 </div>
-                <div class="results-content">
-                    <p>Your email <strong>${email}</strong> is from an unknown provider, but we'll still send the verification email!</p>
-                    ${behindTheScenesMode ? behindTheScenesPanel : ''}
+            `;
+        } else {
+            content = `
+                <div class="results-card unknown">
+                    <div class="results-header">
+                        <div class="results-icon">❓</div>
+                        <div class="results-title">
+                            <h3>Found Your Email Provider</h3>
+                            <p>Email provider: Unknown</p>
+                        </div>
+                    </div>
+                    <div class="results-content">
+                        <p>Your email <strong>${email}</strong> is from an unknown provider, but we'll still send the verification email!</p>
+                        ${behindTheScenesMode ? behindTheScenesPanel : ''}
+                    </div>
+                    <button class="inbox-button disabled" disabled>
+                        Please check your email application
+                    </button>
                 </div>
-                <button class="inbox-button disabled" disabled>
-                    Please check your email application
-                </button>
-            </div>
-        `;
+            `;
+        }
     }
     
         providerDetection.innerHTML = content;
