@@ -326,6 +326,9 @@ function isValidEmailForDemo(email) {
     if (!local || !domain) return false;
     if (local.startsWith('.') || local.endsWith('.')) return false;
     if (domain.startsWith('.') || domain.endsWith('.')) return false;
+    
+    // Require at least one period in the domain part (for TLD)
+    if (!domain.includes('.')) return false;
 
     return true;
 }
