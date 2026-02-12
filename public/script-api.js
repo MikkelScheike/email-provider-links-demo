@@ -404,12 +404,6 @@ function showInlineResults(email) {
                             </div>
                         </div>
                     ` : ''}
-                    ${currentDetectedProvider && currentDetectedProvider._meta ? `
-                        <div class="debug-meta">
-                            <span><strong>Detection Time:</strong> ${currentDetectedProvider._meta.detectionTime || 'n/a'}</span>
-                            <span><strong>Library Version:</strong> ${currentDetectedProvider._meta.libraryVersion || 'n/a'}</span>
-                        </div>
-                    ` : ''}
                 </div>
             `;
         }
@@ -511,12 +505,6 @@ function showInlineResults(email) {
                                 <div class="debug-label">Raw response</div>
                                 <pre class="debug-pre">${resultData}</pre>
                             </div>
-                        </div>
-                    ` : ''}
-                    ${currentDetectedProvider && currentDetectedProvider._meta ? `
-                        <div class="debug-meta">
-                            <span><strong>Detection Time:</strong> ${currentDetectedProvider._meta.detectionTime || 'n/a'}</span>
-                            <span><strong>Library Version:</strong> ${currentDetectedProvider._meta.libraryVersion || 'n/a'}</span>
                         </div>
                     ` : ''}
                 </div>

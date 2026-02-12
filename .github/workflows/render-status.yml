@@ -1,0 +1,253 @@
+name: Render Deployment Status
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      service_id:
+        description: 'Render Service ID (optional, will auto-detect if not provided)'
+        required: false
+        type: string
+
+jobs:
+  check-deployment-status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      deployments: write
+      statuses: write
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '25.5.0'
+
+      - name: Get Render Service ID
+        id: get-service-id
+        run: |
+          if [ -n "${{ github.event.inputs.service_id }}" ]; then
+            echo "service_id=${{ github.event.inputs.service_id }}" >> $GITHUB_OUTPUT
+            echo "✅ Using service ID from workflow input"
+          elif [ -n "${{ secrets.RENDER_SERVICE_ID }}" ]; then
+            echo "service_id=${{ secrets.RENDER_SERVICE_ID }}" >> $GITHUB_OUTPUT
+            echo "✅ Using service ID from secrets"
+          else
+            # Try to get service ID from Render API by service name
+            SERVICE_NAME="${{ secrets.RENDER_SERVICE_NAME }}"
+            if [ -z "$SERVICE_NAME" ]; then
+              SERVICE_NAME="email-provider-links-demo"
+            fi
+            echo "🔍 Looking for service: $SERVICE_NAME"
+            
+            SERVICES=$(curl -s \
+              -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+              "https://api.render.com/v1/services")
+            
+            SERVICE_ID=$(echo "$SERVICES" | jq -r ".[] | select(.service.name == \"$SERVICE_NAME\") | .service.id" | head -n 1)
+            
+            if [ -z "$SERVICE_ID" ] || [ "$SERVICE_ID" = "null" ]; then
+              echo "❌ Could not find service '$SERVICE_NAME'"
+              echo ""
+              echo "Available services:"
+              echo "$SERVICES" | jq -r '.[] | "  - \(.service.name) (ID: \(.service.id))"'
+              echo ""
+              echo "Please set one of:"
+              echo "  - RENDER_SERVICE_ID secret"
+              echo "  - RENDER_SERVICE_NAME secret (to use a different service name)"
+              echo "  - service_id input when running workflow manually"
+              exit 1
+            fi
+            
+            echo "service_id=$SERVICE_ID" >> $GITHUB_OUTPUT
+            echo "✅ Found service ID: $SERVICE_ID"
+          fi
+
+      - name: Get latest deployment
+        id: get-deployment
+        run: |
+          SERVICE_ID="${{ steps.get-service-id.outputs.service_id }}"
+          COMMIT_SHA="${{ github.sha }}"
+          
+          # Get the latest deployment for this service
+          DEPLOYMENT=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            "https://api.render.com/v1/services/$SERVICE_ID/deploys" | \
+            jq -r 'sort_by(.deploy.createdAt) | reverse | .[0]')
+          
+          DEPLOY_ID=$(echo "$DEPLOYMENT" | jq -r '.deploy.id')
+          DEPLOY_STATUS=$(echo "$DEPLOYMENT" | jq -r '.deploy.status')
+          DEPLOY_COMMIT=$(echo "$DEPLOYMENT" | jq -r '.deploy.commit.id // .deploy.commitSHA // ""')
+          
+          echo "deploy_id=$DEPLOY_ID" >> $GITHUB_OUTPUT
+          echo "deploy_status=$DEPLOY_STATUS" >> $GITHUB_OUTPUT
+          echo "deploy_commit=$DEPLOY_COMMIT" >> $GITHUB_OUTPUT
+          
+          echo "📦 Deployment ID: $DEPLOY_ID"
+          echo "📊 Status: $DEPLOY_STATUS"
+          echo "🔖 Commit: $DEPLOY_COMMIT"
+
+      - name: Wait for deployment completion
+        id: wait-deployment
+        if: steps.get-deployment.outputs.deploy_status != 'live' && steps.get-deployment.outputs.deploy_status != 'deactivated'
+        run: |
+          SERVICE_ID="${{ steps.get-service-id.outputs.service_id }}"
+          DEPLOY_ID="${{ steps.get-deployment.outputs.deploy_id }}"
+          MAX_WAIT=1800  # 30 minutes
+          ELAPSED=0
+          INTERVAL=10
+          
+          echo "⏳ Waiting for deployment to complete..."
+          
+          while [ $ELAPSED -lt $MAX_WAIT ]; do
+            STATUS=$(curl -s \
+              -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+              "https://api.render.com/v1/services/$SERVICE_ID/deploys/$DEPLOY_ID" | \
+              jq -r '.deploy.status')
+            
+            echo "⏱️  Status: $STATUS (elapsed: ${ELAPSED}s)"
+            
+            if [ "$STATUS" = "live" ] || [ "$STATUS" = "deactivated" ] || [ "$STATUS" = "build_failed" ] || [ "$STATUS" = "update_failed" ]; then
+              echo "deploy_status=$STATUS" >> $GITHUB_OUTPUT
+              break
+            fi
+            
+            sleep $INTERVAL
+            ELAPSED=$((ELAPSED + INTERVAL))
+          done
+          
+          if [ $ELAPSED -ge $MAX_WAIT ]; then
+            echo "⏰ Timeout waiting for deployment"
+            echo "deploy_status=timeout" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get deployment details
+        id: deployment-details
+        run: |
+          SERVICE_ID="${{ steps.get-service-id.outputs.service_id }}"
+          DEPLOY_ID="${{ steps.wait-deployment.outputs.deploy_id || steps.get-deployment.outputs.deploy_id }}"
+          
+          DEPLOYMENT=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            "https://api.render.com/v1/services/$SERVICE_ID/deploys/$DEPLOY_ID")
+          
+          DEPLOY_STATUS="${{ steps.wait-deployment.outputs.deploy_status || steps.get-deployment.outputs.deploy_status }}"
+          DEPLOY_URL=$(echo "$DEPLOYMENT" | jq -r '.deploy.url // ""')
+          DEPLOY_COMMIT=$(echo "$DEPLOYMENT" | jq -r '.deploy.commit.id // .deploy.commitSHA // ""')
+          
+          echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "deploy_commit=$DEPLOY_COMMIT" >> $GITHUB_OUTPUT
+          
+          echo "🌐 Deployment URL: $DEPLOY_URL"
+          echo "📊 Final Status: $DEPLOY_STATUS"
+
+      - name: Create GitHub deployment status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ steps.deployment-details.outputs.deploy_status }}';
+            const deployUrl = '${{ steps.deployment-details.outputs.deploy_url }}';
+            const commitSha = '${{ github.sha }}';
+            
+            // Map Render status to GitHub deployment status
+            let githubState = 'pending';
+            let description = 'Deployment in progress';
+            
+            if (status === 'live') {
+              githubState = 'success';
+              description = 'Deployment successful';
+            } else if (status === 'build_failed' || status === 'update_failed' || status === 'deactivated') {
+              githubState = 'failure';
+              description = `Deployment failed: ${status}`;
+            } else if (status === 'timeout') {
+              githubState = 'error';
+              description = 'Deployment timed out';
+            }
+            
+            // Create or update deployment
+            const deployment = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: commitSha,
+              environment: 'production',
+              auto_merge: false,
+              required_contexts: []
+            });
+            
+            // Create deployment status
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deployment.data.id,
+              state: githubState,
+              description: description,
+              environment: 'production',
+              environment_url: deployUrl || undefined,
+              log_url: deployUrl ? `${deployUrl}/logs` : undefined
+            });
+            
+            console.log(`✅ Created deployment status: ${githubState} - ${description}`);
+
+      - name: Create commit status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ steps.deployment-details.outputs.deploy_status }}';
+            const deployUrl = '${{ steps.deployment-details.outputs.deploy_url }}';
+            
+            let githubState = 'pending';
+            let description = 'Render deployment in progress';
+            
+            if (status === 'live') {
+              githubState = 'success';
+              description = 'Render deployment successful';
+            } else if (status === 'build_failed' || status === 'update_failed' || status === 'deactivated') {
+              githubState = 'failure';
+              description = `Render deployment failed: ${status}`;
+            } else if (status === 'timeout') {
+              githubState = 'error';
+              description = 'Render deployment timed out';
+            }
+            
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: githubState,
+              target_url: deployUrl || undefined,
+              description: description,
+              context: 'render/deployment'
+            });
+            
+            console.log(`✅ Created commit status: ${githubState} - ${description}`);
+
+      - name: Summary
+        if: always()
+        run: |
+          STATUS="${{ steps.deployment-details.outputs.deploy_status }}"
+          URL="${{ steps.deployment-details.outputs.deploy_url }}"
+          
+          echo "## Render Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** $STATUS" >> $GITHUB_STEP_SUMMARY
+          if [ -n "$URL" ]; then
+            echo "**URL:** [$URL]($URL)" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "$STATUS" = "live" ]; then
+            echo "✅ Deployment successful!" >> $GITHUB_STEP_SUMMARY
+          elif [ "$STATUS" = "build_failed" ] || [ "$STATUS" = "update_failed" ]; then
+            echo "❌ Deployment failed. Check Render dashboard for details." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Deployment status: $STATUS" >> $GITHUB_STEP_SUMMARY
+          fi

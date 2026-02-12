@@ -1,0 +1,155 @@
+name: Render Deployment Status (Simple)
+
+# This is a simpler version that just checks and reports deployment status
+# without waiting for deployments to complete. Useful for status checks only.
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  check-deployment-status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      statuses: write
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get Render Service ID
+        id: get-service-id
+        run: |
+          if [ -n "${{ secrets.RENDER_SERVICE_ID }}" ]; then
+            echo "service_id=${{ secrets.RENDER_SERVICE_ID }}" >> $GITHUB_OUTPUT
+            echo "✅ Using service ID from secrets"
+          else
+            # Try to get service ID from Render API by service name
+            SERVICE_NAME="${{ secrets.RENDER_SERVICE_NAME }}"
+            if [ -z "$SERVICE_NAME" ]; then
+              SERVICE_NAME="email-provider-links-demo"
+            fi
+            echo "🔍 Looking for service: $SERVICE_NAME"
+            
+            SERVICES=$(curl -s \
+              -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+              "https://api.render.com/v1/services")
+            
+            SERVICE_ID=$(echo "$SERVICES" | jq -r ".[] | select(.service.name == \"$SERVICE_NAME\") | .service.id" | head -n 1)
+            
+            if [ -z "$SERVICE_ID" ] || [ "$SERVICE_ID" = "null" ]; then
+              echo "❌ Could not find service '$SERVICE_NAME'"
+              echo ""
+              echo "Available services:"
+              echo "$SERVICES" | jq -r '.[] | "  - \(.service.name) (ID: \(.service.id))"'
+              echo ""
+              echo "Please set RENDER_SERVICE_ID secret or RENDER_SERVICE_NAME secret"
+              exit 1
+            fi
+            
+            echo "service_id=$SERVICE_ID" >> $GITHUB_OUTPUT
+            echo "✅ Found service ID: $SERVICE_ID"
+          fi
+
+      - name: Get latest deployment status
+        id: deployment-status
+        run: |
+          SERVICE_ID="${{ steps.get-service-id.outputs.service_id }}"
+          
+          # Get the latest deployment
+          DEPLOYMENT=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            "https://api.render.com/v1/services/$SERVICE_ID/deploys" | \
+            jq -r 'sort_by(.deploy.createdAt) | reverse | .[0]')
+          
+          STATUS=$(echo "$DEPLOYMENT" | jq -r '.deploy.status')
+          URL=$(echo "$DEPLOYMENT" | jq -r '.deploy.url // ""')
+          CREATED=$(echo "$DEPLOYMENT" | jq -r '.deploy.createdAt')
+          COMMIT=$(echo "$DEPLOYMENT" | jq -r '.deploy.commit.id // .deploy.commitSHA // "unknown"')
+          
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "created=$CREATED" >> $GITHUB_OUTPUT
+          echo "commit=$COMMIT" >> $GITHUB_OUTPUT
+          
+          echo "📊 Latest Deployment Status: $STATUS"
+          echo "🌐 URL: $URL"
+          echo "🕐 Created: $CREATED"
+          echo "🔖 Commit: $COMMIT"
+
+      - name: Create commit status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ steps.deployment-status.outputs.status }}';
+            const deployUrl = '${{ steps.deployment-status.outputs.url }}';
+            const created = '${{ steps.deployment-status.outputs.created }}';
+            
+            let githubState = 'pending';
+            let description = 'Render deployment status';
+            
+            if (status === 'live') {
+              githubState = 'success';
+              description = 'Render deployment is live';
+            } else if (status === 'build_failed' || status === 'update_failed') {
+              githubState = 'failure';
+              description = `Render deployment failed: ${status}`;
+            } else if (status === 'deactivated') {
+              githubState = 'failure';
+              description = 'Render deployment deactivated';
+            } else {
+              githubState = 'pending';
+              description = `Render deployment: ${status}`;
+            }
+            
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: githubState,
+              target_url: deployUrl || undefined,
+              description: description,
+              context: 'render/deployment'
+            });
+            
+            console.log(`✅ Status check created: ${githubState} - ${description}`);
+
+      - name: Summary
+        if: always()
+        run: |
+          STATUS="${{ steps.deployment-status.outputs.status }}"
+          URL="${{ steps.deployment-status.outputs.url }}"
+          CREATED="${{ steps.deployment-status.outputs.created }}"
+          
+          echo "## Render Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** \`$STATUS\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Created:** $CREATED" >> $GITHUB_STEP_SUMMARY
+          if [ -n "$URL" ] && [ "$URL" != "null" ]; then
+            echo "**URL:** [$URL]($URL)" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          case "$STATUS" in
+            "live")
+              echo "✅ Deployment is live and running" >> $GITHUB_STEP_SUMMARY
+              ;;
+            "build_failed"|"update_failed")
+              echo "❌ Deployment failed. Check [Render dashboard](https://dashboard.render.com) for details." >> $GITHUB_STEP_SUMMARY
+              ;;
+            "deactivated")
+              echo "⚠️ Deployment has been deactivated" >> $GITHUB_STEP_SUMMARY
+              ;;
+            *)
+              echo "⏳ Deployment status: \`$STATUS\`" >> $GITHUB_STEP_SUMMARY
+              ;;
+          esac

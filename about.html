@@ -46,26 +46,102 @@
                 
                 <!-- How It Works -->
                 <h2>How does it work?</h2>
+                
+                <p style="margin-bottom: 2rem;">The library uses a multi-step detection process that combines fast database lookups with intelligent DNS analysis. Here's exactly what happens when you call <code>getEmailProvider(email)</code>:</p>
+                
                 <div class="technical-details">
                     <div class="detection-method">
-                        <h3>1. Domain Matching</h3>
-                        <p>Instantly recognizes popular providers like Gmail, Outlook, Yahoo, and 40+ others from a curated database.</p>
+                        <h3>Step 1: Email Parsing & Normalization</h3>
+                        <p>First, the email address is parsed and normalized:</p>
+                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                            <li>Extracts the domain from the email (e.g., <code>example.com</code> from <code>user@example.com</code>)</li>
+                            <li>Normalizes Gmail addresses by removing dots and plus aliases (e.g., <code>john.doe+tag@gmail.com</code> → <code>johndoe@gmail.com</code>)</li>
+                            <li>Handles common email alias patterns for other providers</li>
+                        </ul>
                     </div>
                     
                     <div class="detection-method">
-                        <h3>2. DNS Lookup</h3>
-                        <p>For unknown domains, performs MX record analysis to identify the underlying email infrastructure.</p>
+                        <h3>Step 2: Domain Database Lookup</h3>
+                        <p>The library maintains a comprehensive database of 218+ email domains mapped to their providers. This includes:</p>
+                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                            <li><strong>Consumer providers:</strong> gmail.com → Gmail, outlook.com → Microsoft Outlook, yahoo.com → Yahoo Mail, etc.</li>
+                            <li><strong>International variants:</strong> gmail.co.uk, outlook.fr, yahoo.co.jp, and many more</li>
+                            <li><strong>Provider aliases:</strong> Multiple domains pointing to the same provider (e.g., hotmail.com, live.com → Outlook)</li>
+                        </ul>
+                        <p style="margin-top: 0.75rem;"><strong>Result:</strong> If found, returns instantly with <code>detectionMethod: 'domain_match'</code> (typically &lt;1ms).</p>
                     </div>
                     
                     <div class="detection-method">
-                        <h3>3. Heuristic Analysis</h3>
-                        <p>Uses advanced patterns to detect email alias services and proxy providers.</p>
+                        <h3>Step 3: DNS MX Record Analysis</h3>
+                        <p>If the domain isn't in the database (common for business/custom domains), the library performs DNS lookups:</p>
+                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                            <li><strong>MX Record Query:</strong> Queries DNS for Mail Exchange (MX) records to find the mail server</li>
+                            <li><strong>Pattern Matching:</strong> Analyzes MX record hostnames for known patterns:
+                                <ul style="margin-top: 0.25rem; padding-left: 1.25rem;">
+                                    <li><code>*.google.com</code> or <code>*.googlemail.com</code> → Google Workspace</li>
+                                    <li><code>*.outlook.com</code>, <code>*.office365.com</code>, <code>*.mail.protection.outlook.com</code> → Microsoft 365</li>
+                                    <li><code>*.yahoo.com</code>, <code>*.yahoodns.net</code> → Yahoo Mail</li>
+                                    <li>And many more patterns for other providers</li>
+                                </ul>
+                            </li>
+                            <li><strong>Timeout Protection:</strong> DNS queries are limited by a configurable timeout (default 5 seconds) to prevent hanging</li>
+                        </ul>
+                        <p style="margin-top: 0.75rem;"><strong>Result:</strong> If a pattern matches, returns with <code>detectionMethod: 'mx_record'</code> or <code>detectionMethod: 'mx_pattern'</code> (typically 50-500ms depending on DNS response time).</p>
                     </div>
                     
                     <div class="detection-method">
-                        <h3>4. Fallback Handling</h3>
-                        <p>Gracefully handles unknown providers while still providing useful feedback.</p>
+                        <h3>Step 4: Heuristic Detection</h3>
+                        <p>For domains that don't match known patterns, the library uses heuristics to detect:</p>
+                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                            <li><strong>Email Alias Services:</strong> Detects proxy/alias services like SimpleLogin, AnonAddy, Firefox Relay by analyzing MX records and domain patterns</li>
+                            <li><strong>Provider-Specific Patterns:</strong> Recognizes common email forwarding services and their characteristics</li>
+                            <li><strong>Domain Analysis:</strong> Examines domain structure, TLD patterns, and other signals</li>
+                        </ul>
+                        <p style="margin-top: 0.75rem;"><strong>Result:</strong> May identify proxy services or provide hints about the email infrastructure.</p>
                     </div>
+                    
+                    <div class="detection-method">
+                        <h3>Step 5: Login URL Retrieval</h3>
+                        <p>Once a provider is identified, the library retrieves the appropriate login URL:</p>
+                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                            <li><strong>Pre-configured URLs:</strong> Each provider in the database has a verified HTTPS login URL</li>
+                            <li><strong>Security Validation:</strong> All URLs are validated to ensure they:
+                                <ul style="margin-top: 0.25rem; padding-left: 1.25rem;">
+                                    <li>Use HTTPS protocol only</li>
+                                    <li>Match allowlisted domains</li>
+                                    <li>Pass malicious pattern detection (no IP addresses, URL shorteners, etc.)</li>
+                                    <li>Are protected against injection attacks</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="detection-method">
+                        <h3>Step 6: Response Formatting</h3>
+                        <p>The library returns a structured result object:</p>
+                        <pre style="background: #f5f5f7; padding: 1rem; border-radius: 8px; overflow-x: auto; margin-top: 0.75rem;"><code>{
+  provider: {
+    companyProvider: "Gmail",
+    loginUrl: "https://mail.google.com/mail/"
+  },
+  email: "user@gmail.com",
+  detectionMethod: "domain_match",
+  // Extended mode includes additional metadata:
+  // - MX records analyzed
+  // - Detection timing breakdown
+  // - Provider metadata
+}</code></pre>
+                    </div>
+                </div>
+                
+                <div style="background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 1rem 1.5rem; margin: 2rem 0; border-radius: 4px;">
+                    <h3 style="margin-top: 0; color: #0369a1;">Performance Characteristics</h3>
+                    <ul style="margin-bottom: 0;">
+                        <li><strong>Known domains:</strong> &lt;1ms (instant database lookup)</li>
+                        <li><strong>Business domains:</strong> 50-500ms (DNS MX record lookup)</li>
+                        <li><strong>Unknown domains:</strong> Returns gracefully with helpful error information</li>
+                        <li><strong>Rate limiting:</strong> Built-in protection prevents DNS query abuse</li>
+                    </ul>
                 </div>
                 
                 <!-- Why use it? -->

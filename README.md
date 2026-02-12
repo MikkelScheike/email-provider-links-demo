@@ -65,6 +65,30 @@ This demo is configured for easy deployment to Render.com:
 
 The `render.yaml` file in this repository contains all the necessary configuration for automatic deployment.
 
+### GitHub Actions Integration
+
+This repository includes GitHub Actions workflows to show Render deployment status in your GitHub repository:
+
+1. **Get your Render API Key**:
+   - Go to [Render Account Settings](https://dashboard.render.com/u/settings?add-api-key)
+   - Click "Create API Key" and copy the key
+
+2. **Add GitHub Secrets**:
+   - Go to your repository → Settings → Secrets and variables → Actions
+   - Add a new secret named `RENDER_API_KEY` with your Render API key
+   - (Optional) Add `RENDER_SERVICE_ID` if you want to specify the service ID directly
+   - (Optional) Add `RENDER_SERVICE_NAME` if your Render service has a different name than `email-provider-links-demo`
+
+3. **Choose a workflow**:
+   - **Full workflow** (`.github/workflows/render-status.yml`): Monitors deployments and waits for completion, creates GitHub deployment statuses
+   - **Simple workflow** (`.github/workflows/render-status-simple.yml`): Quick status checks without waiting
+
+The workflows will automatically:
+- ✅ Show deployment status as GitHub commit status checks
+- ✅ Create GitHub deployment records with environment URLs
+- ✅ Display deployment status in pull requests and commits
+- ✅ Provide deployment summaries in workflow runs
+
 ## 🔍 What's Happening Behind the Scenes?
 
 ### Real-time Detection
