@@ -260,7 +260,7 @@ function showProviderDetection(type, provider = null, detectionMethod = null, me
             
         case 'error':
             content = `
-                <div class="provider-info" style="border-color: rgba(255, 59, 48, 0.3); background: #ffffff;">
+                <div class="provider-info provider-info-error">
                     <div class="provider-logo">⚠️</div>
                     <div class="provider-details">
                         <div class="provider-name">Detection failed</div>
@@ -359,7 +359,7 @@ async function handleFormSubmit(event) {
         clearProviderDetection();
         clearResults();
         providerDetection.innerHTML = `
-            <div class="provider-info" style="border-color: rgba(255, 149, 0, 0.3); background: #ffffff;">
+            <div class="provider-info provider-info-warning">
                 <div class="provider-logo">✉️</div>
                 <div class="provider-details">
                     <div class="provider-name">Invalid email address</div>
