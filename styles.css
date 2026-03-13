@@ -1644,6 +1644,26 @@ body:not(.extended) .mode-label[data-mode="standard"] {
         color: #0c0a09;
     }
 
+    .repo-badge {
+        background: var(--color-border-strong);
+        color: var(--color-text);
+    }
+
+    .repo-badge:hover {
+        background: #57534e;
+        color: var(--color-text);
+    }
+
+    .repo-badge.about {
+        background: #44403c;
+        color: var(--color-text);
+    }
+
+    .repo-badge.about:hover {
+        background: #57534e;
+        color: var(--color-text);
+    }
+
     .repo-badge.npm {
         background: var(--color-accent);
         color: #0c0a09;
