@@ -28,12 +28,12 @@
     "url": "https://github.com/MikkelScheike/email-provider-links-demo/issues"
   },
   "dependencies": {
-    "@mikkelscheike/email-provider-links": "^5.1.2",
+    "@mikkelscheike/email-provider-links": "^5.2.0",
     "express": "^5.2.1",
-    "simple-icons": "^16.6.1"
+    "simple-icons": "^16.26.0"
   },
   "devDependencies": {
-    "esbuild": "^0.27.2"
+    "esbuild": "^0.28.1"
   },
   "engines": {
     "node": "25.5.0"
