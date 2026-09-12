@@ -34,43 +34,12 @@ jobs:
 
       - name: Get Render Service ID
         id: get-service-id
-        run: |
-          if [ -n "${{ github.event.inputs.service_id }}" ]; then
-            echo "service_id=${{ github.event.inputs.service_id }}" >> $GITHUB_OUTPUT
-            echo "✅ Using service ID from workflow input"
-          elif [ -n "${{ secrets.RENDER_SERVICE_ID }}" ]; then
-            echo "service_id=${{ secrets.RENDER_SERVICE_ID }}" >> $GITHUB_OUTPUT
-            echo "✅ Using service ID from secrets"
-          else
-            # Try to get service ID from Render API by service name
-            SERVICE_NAME="${{ secrets.RENDER_SERVICE_NAME }}"
-            if [ -z "$SERVICE_NAME" ]; then
-              SERVICE_NAME="email-provider-links-demo"
-            fi
-            echo "🔍 Looking for service: $SERVICE_NAME"
-            
-            SERVICES=$(curl -s \
-              -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-              "https://api.render.com/v1/services")
-            
-            SERVICE_ID=$(echo "$SERVICES" | jq -r ".[] | select(.service.name == \"$SERVICE_NAME\") | .service.id" | head -n 1)
-            
-            if [ -z "$SERVICE_ID" ] || [ "$SERVICE_ID" = "null" ]; then
-              echo "❌ Could not find service '$SERVICE_NAME'"
-              echo ""
-              echo "Available services:"
-              echo "$SERVICES" | jq -r '.[] | "  - \(.service.name) (ID: \(.service.id))"'
-              echo ""
-              echo "Please set one of:"
-              echo "  - RENDER_SERVICE_ID secret"
-              echo "  - RENDER_SERVICE_NAME secret (to use a different service name)"
-              echo "  - service_id input when running workflow manually"
-              exit 1
-            fi
-            
-            echo "service_id=$SERVICE_ID" >> $GITHUB_OUTPUT
-            echo "✅ Found service ID: $SERVICE_ID"
-          fi
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+          RENDER_SERVICE_NAME: ${{ secrets.RENDER_SERVICE_NAME }}
+          INPUT_SERVICE_ID: ${{ github.event.inputs.service_id }}
+        run: bash .github/scripts/get-render-service-id.sh
 
       - name: Get latest deployment
         id: get-deployment
@@ -79,14 +48,16 @@ jobs:
           COMMIT_SHA="${{ github.sha }}"
           
           # Get the latest deployment for this service
-          DEPLOYMENT=$(curl -s \
+          DEPLOYMENT=$(curl -sS \
+            -H "Accept: application/json" \
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-            "https://api.render.com/v1/services/$SERVICE_ID/deploys" | \
+            "https://api.render.com/v1/services/$SERVICE_ID/deploys?limit=20" | \
+            jq -e 'if type == "array" then . else error("Render deploys response was not an array") end' | \
             jq -r 'sort_by(.deploy.createdAt) | reverse | .[0]')
           
-          DEPLOY_ID=$(echo "$DEPLOYMENT" | jq -r '.deploy.id')
-          DEPLOY_STATUS=$(echo "$DEPLOYMENT" | jq -r '.deploy.status')
-          DEPLOY_COMMIT=$(echo "$DEPLOYMENT" | jq -r '.deploy.commit.id // .deploy.commitSHA // ""')
+          DEPLOY_ID=$(echo "$DEPLOYMENT" | jq -r '.deploy.id // .id')
+          DEPLOY_STATUS=$(echo "$DEPLOYMENT" | jq -r '.deploy.status // .status')
+          DEPLOY_COMMIT=$(echo "$DEPLOYMENT" | jq -r '.deploy.commit.id // .deploy.commitSHA // .commit.id // ""')
           
           echo "deploy_id=$DEPLOY_ID" >> $GITHUB_OUTPUT
           echo "deploy_status=$DEPLOY_STATUS" >> $GITHUB_OUTPUT
@@ -109,10 +80,11 @@ jobs:
           echo "⏳ Waiting for deployment to complete..."
           
           while [ $ELAPSED -lt $MAX_WAIT ]; do
-            STATUS=$(curl -s \
+            STATUS=$(curl -sS \
+              -H "Accept: application/json" \
               -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
               "https://api.render.com/v1/services/$SERVICE_ID/deploys/$DEPLOY_ID" | \
-              jq -r '.deploy.status')
+              jq -r '.deploy.status // .status')
             
             echo "⏱️  Status: $STATUS (elapsed: ${ELAPSED}s)"
             
@@ -136,13 +108,14 @@ jobs:
           SERVICE_ID="${{ steps.get-service-id.outputs.service_id }}"
           DEPLOY_ID="${{ steps.wait-deployment.outputs.deploy_id || steps.get-deployment.outputs.deploy_id }}"
           
-          DEPLOYMENT=$(curl -s \
+          DEPLOYMENT=$(curl -sS \
+            -H "Accept: application/json" \
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
             "https://api.render.com/v1/services/$SERVICE_ID/deploys/$DEPLOY_ID")
           
           DEPLOY_STATUS="${{ steps.wait-deployment.outputs.deploy_status || steps.get-deployment.outputs.deploy_status }}"
-          DEPLOY_URL=$(echo "$DEPLOYMENT" | jq -r '.deploy.url // ""')
-          DEPLOY_COMMIT=$(echo "$DEPLOYMENT" | jq -r '.deploy.commit.id // .deploy.commitSHA // ""')
+          DEPLOY_URL=$(echo "$DEPLOYMENT" | jq -r '.deploy.url // .url // ""')
+          DEPLOY_COMMIT=$(echo "$DEPLOYMENT" | jq -r '.deploy.commit.id // .deploy.commitSHA // .commit.id // ""')
           
           echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
           echo "deploy_commit=$DEPLOY_COMMIT" >> $GITHUB_OUTPUT
