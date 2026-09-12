@@ -147,7 +147,6 @@ function getProviderLogo(provider, size = 24) {
         'Google Workspace': 'google',
         'Microsoft Outlook': 'outlook',
         'Microsoft 365': 'microsoft',
-        'Yahoo Mail': 'yahoo',
         'ProtonMail': 'protonmail',
         'iCloud Mail': 'icloud'
     };

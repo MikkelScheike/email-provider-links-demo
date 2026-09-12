@@ -2,26 +2,11 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { createRequire } from 'module';
-import { getEmailProvider } from '@mikkelscheike/email-provider-links';
+import { getEmailProvider, VERSION } from '@mikkelscheike/email-provider-links';
 import * as simpleIcons from 'simple-icons';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-const require = createRequire(import.meta.url);
-
-function getEmailProviderLinksVersion() {
-    try {
-        const pkgPath = require.resolve('@mikkelscheike/email-provider-links/package.json');
-        const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-        return pkg.version || null;
-    } catch {
-        return null;
-    }
-}
-
-const emailProviderLinksVersion = getEmailProviderLinksVersion();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -53,7 +38,7 @@ app.post('/api/detect-provider', async (req, res) => {
             _meta: {
                 detectionTime: `${detectionTime}ms`,
                 timestamp: new Date().toISOString(),
-                libraryVersion: emailProviderLinksVersion,
+                libraryVersion: VERSION,
                 extended: extended
             }
         };
@@ -97,14 +82,12 @@ app.get('/api/icon/:iconName', (req, res) => {
         const iconMap = {
             'gmail': 'siGmail',
             'google': 'siGoogle',
-            'yahoo': 'siYahoo',
             'protonmail': 'siProtonmail',
             'icloud': 'siIcloud',
             'apple': 'siApple',
-            'tutanota': 'siTutanota',
-            'fastmail': 'siFastmail',
+            'tutanota': 'siTuta',
+            'tuta': 'siTuta',
             'zoho': 'siZoho',
-            'aol': 'siAol',
             'gmx': 'siGmx',
             'simplelogin': 'siSimplelogin',
             'firefox': 'siFirefox',

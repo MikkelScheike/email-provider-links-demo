@@ -7,7 +7,7 @@ A beautiful, interactive demo showcasing the power of the `@mikkelscheike/email-
 ## 🚀 Features
 
 - **Real-time Email Provider Detection**: As users type their email, the system instantly detects their provider
-- **93+ Supported Providers**: Gmail, Outlook, Yahoo, ProtonMail, business domains, and many more
+- **140 Supported Providers**: Gmail, Outlook, Yahoo, ProtonMail, business domains, and many more
 - **Direct Inbox Links**: After signup, users get a direct link to their email provider
 - **Business Domain Detection**: Automatically detects Google Workspace, Microsoft 365, and other business email services via DNS
 - **Modern UI**: Beautiful, responsive design with smooth animations
@@ -125,7 +125,7 @@ The demo showcases the main library function:
 import { getEmailProvider } from '@mikkelscheike/email-provider-links';
 
 const result = await getEmailProvider('user@example.com');
-// Returns: { provider, loginUrl, detectionMethod, ... }
+// Returns: { provider: { companyProvider, loginUrl, type }, email, detectionMethod }
 ```
 
 ## 🔗 Links
