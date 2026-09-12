@@ -4,6 +4,10 @@
 # RENDER_SERVICE_NAME, INPUT_SERVICE_ID.
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=./render-api.sh
+source "${SCRIPT_DIR}/render-api.sh"
+
 DEFAULT_SERVICE_NAME="email-provider-links-demo"
 API_BASE="https://api.render.com/v1"
 
@@ -21,32 +25,32 @@ fi
 
 if [ -z "${RENDER_API_KEY:-}" ]; then
   echo "❌ RENDER_API_KEY secret is not set."
-  echo "Set RENDER_API_KEY, or set RENDER_SERVICE_ID to skip the lookup."
+  echo "Create a Render Account API key and store only the key value in GitHub Actions secrets."
+  echo "https://dashboard.render.com/u/settings#api-keys"
   exit 1
 fi
 
+describe_render_api_key "$RENDER_API_KEY"
+
 SERVICE_NAME="${RENDER_SERVICE_NAME:-$DEFAULT_SERVICE_NAME}"
 echo "🔍 Looking for service: $SERVICE_NAME"
-
-render_get() {
-  local out="$1"
-  shift
-  curl -sS -o "$out" -w "%{http_code}" \
-    -H "Accept: application/json" \
-    -H "Authorization: Bearer ${RENDER_API_KEY}" \
-    --get "$@"
-}
 
 print_api_error() {
   local code="$1"
   local body="$2"
   echo "❌ Render API returned HTTP ${code}"
+  jq -r '.message // .error // .' "$body" 2>/dev/null || cat "$body"
   if [ "$code" = "401" ] || [ "$code" = "403" ]; then
-    echo "The RENDER_API_KEY secret is missing, expired, or does not have access."
+    echo ""
+    echo "GitHub has a RENDER_API_KEY secret, but Render rejected it."
+    echo "Replace the secret with a new Account API key (not a deploy hook, service ID, or GitHub token):"
+    echo "  1. https://dashboard.render.com/u/settings#api-keys"
+    echo "  2. Create API Key, copy the value once (usually starts with rnd_)"
+    echo "  3. GitHub repo → Settings → Secrets and variables → Actions → update RENDER_API_KEY"
+    echo "  4. Paste only the key. Do not include the word Bearer, quotes, or a trailing newline."
   elif [ "$code" = "406" ]; then
     echo "Render rejected the request (Not Acceptable). This workflow sends Accept: application/json."
   fi
-  jq -r '.message // .error // .' "$body" 2>/dev/null || cat "$body"
 }
 
 BODY="$(mktemp)"

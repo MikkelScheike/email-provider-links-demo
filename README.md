@@ -76,8 +76,12 @@ This repository includes GitHub Actions workflows to show Render deployment stat
 2. **Add GitHub Secrets**:
    - Go to your repository → Settings → Secrets and variables → Actions
    - Add a new secret named `RENDER_API_KEY` with your Render API key
+     - Paste **only** the key (usually starts with `rnd_`)
+     - Do not include `Bearer`, quotes, or a trailing newline
    - (Optional) Add `RENDER_SERVICE_ID` if you want to specify the service ID directly
    - (Optional) Add `RENDER_SERVICE_NAME` if your Render service has a different name than `email-provider-links-demo`
+
+   If the workflow reports **HTTP 401 Unauthorized**, the secret is present but Render rejected it. Create a new Account API key at [Render API Keys](https://dashboard.render.com/u/settings#api-keys) and update `RENDER_API_KEY`. Deploy hooks, service IDs, and GitHub tokens will not work.
 
 3. **Choose a workflow**:
    - **Full workflow** (`.github/workflows/render-status.yml`): Monitors deployments and waits for completion, creates GitHub deployment statuses

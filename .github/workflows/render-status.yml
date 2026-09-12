@@ -43,17 +43,21 @@ jobs:
 
       - name: Get latest deployment
         id: get-deployment
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
           SERVICE_ID="${{ steps.get-service-id.outputs.service_id }}"
-          COMMIT_SHA="${{ github.sha }}"
+          BODY="$(mktemp)"
+          HTTP_CODE="$(bash .github/scripts/render-get.sh "$BODY" \
+            "https://api.render.com/v1/services/${SERVICE_ID}/deploys?limit=20")"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "❌ Render API returned HTTP ${HTTP_CODE}"
+            jq -r '.message // .error // .' "$BODY" 2>/dev/null || cat "$BODY"
+            exit 1
+          fi
           
-          # Get the latest deployment for this service
-          DEPLOYMENT=$(curl -sS \
-            -H "Accept: application/json" \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-            "https://api.render.com/v1/services/$SERVICE_ID/deploys?limit=20" | \
-            jq -e 'if type == "array" then . else error("Render deploys response was not an array") end' | \
-            jq -r 'sort_by(.deploy.createdAt) | reverse | .[0]')
+          DEPLOYMENT=$(jq -e 'if type == "array" then . else error("Render deploys response was not an array") end' "$BODY" | \
+            jq -r 'sort_by(.deploy.createdAt // .createdAt) | reverse | .[0]')
           
           DEPLOY_ID=$(echo "$DEPLOYMENT" | jq -r '.deploy.id // .id')
           DEPLOY_STATUS=$(echo "$DEPLOYMENT" | jq -r '.deploy.status // .status')
@@ -70,6 +74,8 @@ jobs:
       - name: Wait for deployment completion
         id: wait-deployment
         if: steps.get-deployment.outputs.deploy_status != 'live' && steps.get-deployment.outputs.deploy_status != 'deactivated'
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
           SERVICE_ID="${{ steps.get-service-id.outputs.service_id }}"
           DEPLOY_ID="${{ steps.get-deployment.outputs.deploy_id }}"
@@ -80,11 +86,15 @@ jobs:
           echo "⏳ Waiting for deployment to complete..."
           
           while [ $ELAPSED -lt $MAX_WAIT ]; do
-            STATUS=$(curl -sS \
-              -H "Accept: application/json" \
-              -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-              "https://api.render.com/v1/services/$SERVICE_ID/deploys/$DEPLOY_ID" | \
-              jq -r '.deploy.status // .status')
+            BODY="$(mktemp)"
+            HTTP_CODE="$(bash .github/scripts/render-get.sh "$BODY" \
+              "https://api.render.com/v1/services/${SERVICE_ID}/deploys/${DEPLOY_ID}")"
+            if [ "$HTTP_CODE" != "200" ]; then
+              echo "❌ Render API returned HTTP ${HTTP_CODE}"
+              jq -r '.message // .error // .' "$BODY" 2>/dev/null || cat "$BODY"
+              exit 1
+            fi
+            STATUS=$(jq -r '.deploy.status // .status' "$BODY")
             
             echo "⏱️  Status: $STATUS (elapsed: ${ELAPSED}s)"
             
@@ -104,14 +114,20 @@ jobs:
 
       - name: Get deployment details
         id: deployment-details
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
           SERVICE_ID="${{ steps.get-service-id.outputs.service_id }}"
           DEPLOY_ID="${{ steps.wait-deployment.outputs.deploy_id || steps.get-deployment.outputs.deploy_id }}"
-          
-          DEPLOYMENT=$(curl -sS \
-            -H "Accept: application/json" \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-            "https://api.render.com/v1/services/$SERVICE_ID/deploys/$DEPLOY_ID")
+          BODY="$(mktemp)"
+          HTTP_CODE="$(bash .github/scripts/render-get.sh "$BODY" \
+            "https://api.render.com/v1/services/${SERVICE_ID}/deploys/${DEPLOY_ID}")"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "❌ Render API returned HTTP ${HTTP_CODE}"
+            jq -r '.message // .error // .' "$BODY" 2>/dev/null || cat "$BODY"
+            exit 1
+          fi
+          DEPLOYMENT="$(cat "$BODY")"
           
           DEPLOY_STATUS="${{ steps.wait-deployment.outputs.deploy_status || steps.get-deployment.outputs.deploy_status }}"
           DEPLOY_URL=$(echo "$DEPLOYMENT" | jq -r '.deploy.url // .url // ""')
