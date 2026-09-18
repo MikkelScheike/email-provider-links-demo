@@ -256,9 +256,15 @@ body:not(.extended) .mode-label[data-mode="standard"] {
     flex-wrap: wrap;
 }
 
+.npm-badge-container a {
+    display: inline-flex;
+    line-height: 0;
+}
+
 .npm-badge {
     border-radius: 4px;
     height: 20px;
+    display: block;
     transition: transform 0.2s ease;
 }
 
