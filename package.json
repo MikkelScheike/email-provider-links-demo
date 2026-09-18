@@ -30,7 +30,7 @@
   "dependencies": {
     "@mikkelscheike/email-provider-links": "^6.0.0",
     "express": "^5.2.1",
-    "simple-icons": "^16.30.0"
+    "simple-icons": "^16.31.0"
   },
   "devDependencies": {
     "esbuild": "^0.28.2"
