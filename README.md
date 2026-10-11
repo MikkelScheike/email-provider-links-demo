@@ -16,13 +16,13 @@ A beautiful, interactive demo showcasing the power of the `@mikkelscheike/email-
 
 ## 📧 Try These Examples
 
-- **Consumer emails**: 
+- **Consumer emails**:
   - `john@gmail.com` (Gmail)
   - `jane@outlook.com` (Microsoft Outlook)
   - `user@yahoo.com` (Yahoo Mail)
   - `test@protonmail.com` (ProtonMail)
-  
-- **Business emails**: 
+
+- **Business emails**:
   - `business@yourcompany.com` (Will attempt DNS detection)
   - Any custom domain with Google Workspace or Microsoft 365
 
@@ -31,11 +31,13 @@ A beautiful, interactive demo showcasing the power of the `@mikkelscheike/email-
 ### Local Development
 
 1. **Install dependencies**:
+
    ```bash
    npm install
    ```
 
 2. **Start the development server**:
+
    ```bash
    npm run dev
    ```
@@ -89,6 +91,7 @@ This repository includes GitHub Actions workflows to show Render deployment stat
    - **Simple workflow** (`.github/workflows/render-status-simple.yml`): Quick status checks without waiting
 
 The workflows will automatically:
+
 - ✅ Show deployment status as GitHub commit status checks
 - ✅ Create GitHub deployment records with environment URLs
 - ✅ Display deployment status in pull requests and commits
@@ -97,13 +100,16 @@ The workflows will automatically:
 ## 🔍 What's Happening Behind the Scenes?
 
 ### Real-time Detection
+
 As you type an email address, the demo:
+
 1. Validates the email format
 2. Checks if it's a known consumer provider (instant response)
 3. For unknown domains, performs DNS lookups to detect business email services
 4. Shows visual feedback with provider logos and detection methods
 
 ### Smart UX
+
 - **Debounced input**: Waits 500ms after typing stops before detecting
 - **Loading states**: Shows "detecting" animation for DNS lookups
 - **Visual feedback**: Different colors and badges for different provider types
@@ -127,9 +133,9 @@ As you type an email address, the demo:
 The demo showcases the main library function:
 
 ```javascript
-import { getEmailProvider } from '@mikkelscheike/email-provider-links';
+import { getEmailProvider } from "@mikkelscheike/email-provider-links";
 
-const result = await getEmailProvider('user@example.com');
+const result = await getEmailProvider("user@example.com");
 // Returns: { provider: { companyProvider, loginUrl, type }, email, detectionMethod }
 ```
 

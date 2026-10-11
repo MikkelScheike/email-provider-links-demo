@@ -21,7 +21,7 @@ jobs:
     permissions:
       statuses: write
       contents: read
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -48,20 +48,20 @@ jobs:
             jq -r '.message // .error // .' "$BODY" 2>/dev/null || cat "$BODY"
             exit 1
           fi
-          
+
           DEPLOYMENT=$(jq -e 'if type == "array" then . else error("Render deploys response was not an array") end' "$BODY" | \
             jq -r 'sort_by(.deploy.createdAt // .createdAt) | reverse | .[0]')
-          
+
           STATUS=$(echo "$DEPLOYMENT" | jq -r '.deploy.status // .status')
           URL=$(echo "$DEPLOYMENT" | jq -r '.deploy.url // .url // ""')
           CREATED=$(echo "$DEPLOYMENT" | jq -r '.deploy.createdAt // .createdAt')
           COMMIT=$(echo "$DEPLOYMENT" | jq -r '.deploy.commit.id // .deploy.commitSHA // .commit.id // "unknown"')
-          
+
           echo "status=$STATUS" >> $GITHUB_OUTPUT
           echo "url=$URL" >> $GITHUB_OUTPUT
           echo "created=$CREATED" >> $GITHUB_OUTPUT
           echo "commit=$COMMIT" >> $GITHUB_OUTPUT
-          
+
           echo "📊 Latest Deployment Status: $STATUS"
           echo "🌐 URL: $URL"
           echo "🕐 Created: $CREATED"
@@ -74,10 +74,10 @@ jobs:
             const status = '${{ steps.deployment-status.outputs.status }}';
             const deployUrl = '${{ steps.deployment-status.outputs.url }}';
             const created = '${{ steps.deployment-status.outputs.created }}';
-            
+
             let githubState = 'pending';
             let description = 'Render deployment status';
-            
+
             if (status === 'live') {
               githubState = 'success';
               description = 'Render deployment is live';
@@ -91,7 +91,7 @@ jobs:
               githubState = 'pending';
               description = `Render deployment: ${status}`;
             }
-            
+
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -101,7 +101,7 @@ jobs:
               description: description,
               context: 'render/deployment'
             });
-            
+
             console.log(`✅ Status check created: ${githubState} - ${description}`);
 
       - name: Summary
@@ -110,7 +110,7 @@ jobs:
           STATUS="${{ steps.deployment-status.outputs.status }}"
           URL="${{ steps.deployment-status.outputs.url }}"
           CREATED="${{ steps.deployment-status.outputs.created }}"
-          
+
           echo "## Render Deployment Status" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** \`$STATUS\`" >> $GITHUB_STEP_SUMMARY
@@ -119,7 +119,7 @@ jobs:
             echo "**URL:** [$URL]($URL)" >> $GITHUB_STEP_SUMMARY
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           case "$STATUS" in
             "live")
               echo "✅ Deployment is live and running" >> $GITHUB_STEP_SUMMARY

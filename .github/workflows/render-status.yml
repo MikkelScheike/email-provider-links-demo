@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       service_id:
-        description: 'Render Service ID (optional, will auto-detect if not provided)'
+        description: "Render Service ID (optional, will auto-detect if not provided)"
         required: false
         type: string
 
@@ -20,7 +20,7 @@ jobs:
       deployments: write
       statuses: write
       contents: read
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '25.5.0'
+          node-version: "25.5.0"
 
       - name: Get Render Service ID
         id: get-service-id
@@ -55,18 +55,18 @@ jobs:
             jq -r '.message // .error // .' "$BODY" 2>/dev/null || cat "$BODY"
             exit 1
           fi
-          
+
           DEPLOYMENT=$(jq -e 'if type == "array" then . else error("Render deploys response was not an array") end' "$BODY" | \
             jq -r 'sort_by(.deploy.createdAt // .createdAt) | reverse | .[0]')
-          
+
           DEPLOY_ID=$(echo "$DEPLOYMENT" | jq -r '.deploy.id // .id')
           DEPLOY_STATUS=$(echo "$DEPLOYMENT" | jq -r '.deploy.status // .status')
           DEPLOY_COMMIT=$(echo "$DEPLOYMENT" | jq -r '.deploy.commit.id // .deploy.commitSHA // .commit.id // ""')
-          
+
           echo "deploy_id=$DEPLOY_ID" >> $GITHUB_OUTPUT
           echo "deploy_status=$DEPLOY_STATUS" >> $GITHUB_OUTPUT
           echo "deploy_commit=$DEPLOY_COMMIT" >> $GITHUB_OUTPUT
-          
+
           echo "📦 Deployment ID: $DEPLOY_ID"
           echo "📊 Status: $DEPLOY_STATUS"
           echo "🔖 Commit: $DEPLOY_COMMIT"
@@ -82,9 +82,9 @@ jobs:
           MAX_WAIT=1800  # 30 minutes
           ELAPSED=0
           INTERVAL=10
-          
+
           echo "⏳ Waiting for deployment to complete..."
-          
+
           while [ $ELAPSED -lt $MAX_WAIT ]; do
             BODY="$(mktemp)"
             HTTP_CODE="$(bash .github/scripts/render-get.sh "$BODY" \
@@ -106,7 +106,7 @@ jobs:
             sleep $INTERVAL
             ELAPSED=$((ELAPSED + INTERVAL))
           done
-          
+
           if [ $ELAPSED -ge $MAX_WAIT ]; then
             echo "⏰ Timeout waiting for deployment"
             echo "deploy_status=timeout" >> $GITHUB_OUTPUT
@@ -128,14 +128,14 @@ jobs:
             exit 1
           fi
           DEPLOYMENT="$(cat "$BODY")"
-          
+
           DEPLOY_STATUS="${{ steps.wait-deployment.outputs.deploy_status || steps.get-deployment.outputs.deploy_status }}"
           DEPLOY_URL=$(echo "$DEPLOYMENT" | jq -r '.deploy.url // .url // ""')
           DEPLOY_COMMIT=$(echo "$DEPLOYMENT" | jq -r '.deploy.commit.id // .deploy.commitSHA // .commit.id // ""')
-          
+
           echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
           echo "deploy_commit=$DEPLOY_COMMIT" >> $GITHUB_OUTPUT
-          
+
           echo "🌐 Deployment URL: $DEPLOY_URL"
           echo "📊 Final Status: $DEPLOY_STATUS"
 
@@ -146,11 +146,11 @@ jobs:
             const status = '${{ steps.deployment-details.outputs.deploy_status }}';
             const deployUrl = '${{ steps.deployment-details.outputs.deploy_url }}';
             const commitSha = '${{ github.sha }}';
-            
+
             // Map Render status to GitHub deployment status
             let githubState = 'pending';
             let description = 'Deployment in progress';
-            
+
             if (status === 'live') {
               githubState = 'success';
               description = 'Deployment successful';
@@ -161,7 +161,7 @@ jobs:
               githubState = 'error';
               description = 'Deployment timed out';
             }
-            
+
             // Create or update deployment
             const deployment = await github.rest.repos.createDeployment({
               owner: context.repo.owner,
@@ -171,7 +171,7 @@ jobs:
               auto_merge: false,
               required_contexts: []
             });
-            
+
             // Create deployment status
             await github.rest.repos.createDeploymentStatus({
               owner: context.repo.owner,
@@ -183,7 +183,7 @@ jobs:
               environment_url: deployUrl || undefined,
               log_url: deployUrl ? `${deployUrl}/logs` : undefined
             });
-            
+
             console.log(`✅ Created deployment status: ${githubState} - ${description}`);
 
       - name: Create commit status
@@ -192,10 +192,10 @@ jobs:
           script: |
             const status = '${{ steps.deployment-details.outputs.deploy_status }}';
             const deployUrl = '${{ steps.deployment-details.outputs.deploy_url }}';
-            
+
             let githubState = 'pending';
             let description = 'Render deployment in progress';
-            
+
             if (status === 'live') {
               githubState = 'success';
               description = 'Render deployment successful';
@@ -206,7 +206,7 @@ jobs:
               githubState = 'error';
               description = 'Render deployment timed out';
             }
-            
+
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -216,7 +216,7 @@ jobs:
               description: description,
               context: 'render/deployment'
             });
-            
+
             console.log(`✅ Created commit status: ${githubState} - ${description}`);
 
       - name: Summary
@@ -224,7 +224,7 @@ jobs:
         run: |
           STATUS="${{ steps.deployment-details.outputs.deploy_status }}"
           URL="${{ steps.deployment-details.outputs.deploy_url }}"
-          
+
           echo "## Render Deployment Status" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** $STATUS" >> $GITHUB_STEP_SUMMARY
@@ -232,7 +232,7 @@ jobs:
             echo "**URL:** [$URL]($URL)" >> $GITHUB_STEP_SUMMARY
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ "$STATUS" = "live" ]; then
             echo "✅ Deployment successful!" >> $GITHUB_STEP_SUMMARY
           elif [ "$STATUS" = "build_failed" ] || [ "$STATUS" = "update_failed" ]; then

@@ -1,134 +1,191 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Email Provider Links Demo - Smart Signup</title>
 
     <!-- JSON-LD metadata -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "@mikkelscheike/email-provider-links",
-      "description": "A TypeScript library that simplifies email provider detection and generates direct webmail login links for improved user experience.",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "Any",
-      "downloadUrl": "https://www.npmjs.com/package/@mikkelscheike/email-provider-links",
-      "installUrl": "https://www.npmjs.com/package/@mikkelscheike/email-provider-links",
-      "softwareVersion": "6.0.0",
-      "programmingLanguage": "TypeScript",
-      "codeRepository": "https://github.com/MikkelScheike/email-provider-links",
-      "license": "MIT",
-      "author": {
-        "@type": "Person",
-        "name": "Mikkel Scheike",
-        "url": "https://mikkelscheike.com"
-      },
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "demo": {
-        "@type": "WebSite",
-        "name": "Email Provider Links Demo",
-        "url": "https://demo.mikkelscheike.com",
-        "description": "Interactive demonstration of the email-provider-links library functionality"
-      },
-      "keywords": "email detection, webmail links, email provider, login links, TypeScript library, user experience",
-      "requirements": "Node.js environment or modern web browser",
-      "softwareHelp": "https://github.com/MikkelScheike/email-provider-links#readme"
-    }
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "@mikkelscheike/email-provider-links",
+        "description": "A TypeScript library that simplifies email provider detection and generates direct webmail login links for improved user experience.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "downloadUrl": "https://www.npmjs.com/package/@mikkelscheike/email-provider-links",
+        "installUrl": "https://www.npmjs.com/package/@mikkelscheike/email-provider-links",
+        "softwareVersion": "6.0.0",
+        "programmingLanguage": "TypeScript",
+        "codeRepository": "https://github.com/MikkelScheike/email-provider-links",
+        "license": "MIT",
+        "author": {
+          "@type": "Person",
+          "name": "Mikkel Scheike",
+          "url": "https://mikkelscheike.com"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "demo": {
+          "@type": "WebSite",
+          "name": "Email Provider Links Demo",
+          "url": "https://demo.mikkelscheike.com",
+          "description": "Interactive demonstration of the email-provider-links library functionality"
+        },
+        "keywords": "email detection, webmail links, email provider, login links, TypeScript library, user experience",
+        "requirements": "Node.js environment or modern web browser",
+        "softwareHelp": "https://github.com/MikkelScheike/email-provider-links#readme"
+      }
     </script>
 
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <!-- Skip navigation link for accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="container">
-        <main id="main-content" class="signup-card">
-<div class="demo-title">
-                <h2>Email Provider Links Demo</h2>
-                <div class="npm-badge-container">
-                    <img src="https://img.shields.io/npm/v/@mikkelscheike/email-provider-links" alt="NPM Version" class="npm-badge">
-                    <a href="https://badge.socket.dev/npm/package/@mikkelscheike/email-provider-links/6.0.0" target="_blank" rel="noopener noreferrer">
-                        <img src="https://badge.socket.dev/npm/package/@mikkelscheike/email-provider-links/6.0.0" alt="Socket Score" class="npm-badge">
-                    </a>
-                </div>
-                <p class="demo-subtitle">Rest assured, your email will not be saved.</p>
-                <div class="mode-switch" role="group" aria-label="Display mode">
-                    <span class="mode-label" data-mode="live">Live</span>
-                    <label class="switch">
-                        <input type="checkbox" id="modeToggle" aria-label="Toggle Behind the scenes mode">
-                        <span class="switch-track"></span>
-                        <span class="switch-thumb"></span>
-                    </label>
-                    <span class="mode-label" data-mode="bts">Behind the scenes</span>
-                </div>
-                <div class="mode-switch" role="group" aria-label="Extended mode" style="margin-top: 0.75rem;">
-                    <span class="mode-label" data-mode="standard">Standard</span>
-                    <label class="switch">
-                        <input type="checkbox" id="extendedToggle" aria-label="Toggle Extended mode">
-                        <span class="switch-track"></span>
-                        <span class="switch-thumb"></span>
-                    </label>
-                    <span class="mode-label" data-mode="extended">Extended</span>
-                </div>
-            </div>
-            
-            <form class="signup-form" id="signupForm">
-<div class="form-group">
-<div class="email-input-container">
-                        <label for="email" class="visually-hidden">Email Address</label>
-                        <div class="email-input-row">
-                            <input type="email" id="email" name="email" required placeholder="john@example.com" autocomplete="email">
-                            <button type="submit" class="signup-btn" id="signupBtn">
-                                <span class="btn-text">See result</span>
-                                <span class="btn-spinner"></span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="provider-detection" id="providerDetection" aria-live="polite" aria-atomic="true"></div>
-                </div>
-            </form>
+      <main id="main-content" class="signup-card">
+        <div class="demo-title">
+          <h2>Email Provider Links Demo</h2>
+          <div class="npm-badge-container">
+            <img
+              src="https://img.shields.io/npm/v/@mikkelscheike/email-provider-links"
+              alt="NPM Version"
+              class="npm-badge"
+            />
+            <a
+              href="https://badge.socket.dev/npm/package/@mikkelscheike/email-provider-links/6.0.0"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="https://badge.socket.dev/npm/package/@mikkelscheike/email-provider-links/6.0.0"
+                alt="Socket Score"
+                class="npm-badge"
+              />
+            </a>
+          </div>
+          <p class="demo-subtitle">
+            Rest assured, your email will not be saved.
+          </p>
+          <div class="mode-switch" role="group" aria-label="Display mode">
+            <span class="mode-label" data-mode="live">Live</span>
+            <label class="switch">
+              <input
+                type="checkbox"
+                id="modeToggle"
+                aria-label="Toggle Behind the scenes mode"
+              />
+              <span class="switch-track"></span>
+              <span class="switch-thumb"></span>
+            </label>
+            <span class="mode-label" data-mode="bts">Behind the scenes</span>
+          </div>
+          <div
+            class="mode-switch"
+            role="group"
+            aria-label="Extended mode"
+            style="margin-top: 0.75rem"
+          >
+            <span class="mode-label" data-mode="standard">Standard</span>
+            <label class="switch">
+              <input
+                type="checkbox"
+                id="extendedToggle"
+                aria-label="Toggle Extended mode"
+              />
+              <span class="switch-track"></span>
+              <span class="switch-thumb"></span>
+            </label>
+            <span class="mode-label" data-mode="extended">Extended</span>
+          </div>
+        </div>
 
-            <!-- Results Section -->
-            <div class="results-section" id="resultsSection"></div>
-            
-            <!-- Repository Links -->
-            <div class="repo-links">
-                <div class="link-group">
-                    <a href="./about.html" class="repo-badge about">
-                        <span class="repo-text">About & Guide</span>
-                        <span class="repo-arrow">→</span>
-                    </a>
-                    <a href="https://github.com/MikkelScheike/email-provider-links" target="_blank" class="repo-badge">
-                        <span class="repo-text">Library</span>
-                        <span class="repo-arrow">→</span>
-                    </a>
-                    <a href="https://github.com/MikkelScheike/email-provider-links-demo" target="_blank" class="repo-badge">
-                        <span class="repo-text">Demo</span>
-                        <span class="repo-arrow">→</span>
-                    </a>
-                    <a href="https://www.npmjs.com/package/@mikkelscheike/email-provider-links" target="_blank" class="repo-badge npm">
-                        <span class="repo-text">NPM</span>
-                        <span class="repo-arrow">→</span>
-                    </a>
-                </div>
+        <form class="signup-form" id="signupForm">
+          <div class="form-group">
+            <div class="email-input-container">
+              <label for="email" class="visually-hidden">Email Address</label>
+              <div class="email-input-row">
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  placeholder="john@example.com"
+                  autocomplete="email"
+                />
+                <button type="submit" class="signup-btn" id="signupBtn">
+                  <span class="btn-text">See result</span>
+                  <span class="btn-spinner"></span>
+                </button>
+              </div>
             </div>
-        </main>
-        
-        <!-- Footer -->
-        <footer class="footer">
-            <p>Developed by <a href="https://mikkelscheike.com" target="_blank">Mikkel Scheike</a></p>
-        </footer>
+            <div
+              class="provider-detection"
+              id="providerDetection"
+              aria-live="polite"
+              aria-atomic="true"
+            ></div>
+          </div>
+        </form>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection"></div>
+
+        <!-- Repository Links -->
+        <div class="repo-links">
+          <div class="link-group">
+            <a href="./about.html" class="repo-badge about">
+              <span class="repo-text">About & Guide</span>
+              <span class="repo-arrow">→</span>
+            </a>
+            <a
+              href="https://github.com/MikkelScheike/email-provider-links"
+              target="_blank"
+              class="repo-badge"
+            >
+              <span class="repo-text">Library</span>
+              <span class="repo-arrow">→</span>
+            </a>
+            <a
+              href="https://github.com/MikkelScheike/email-provider-links-demo"
+              target="_blank"
+              class="repo-badge"
+            >
+              <span class="repo-text">Demo</span>
+              <span class="repo-arrow">→</span>
+            </a>
+            <a
+              href="https://www.npmjs.com/package/@mikkelscheike/email-provider-links"
+              target="_blank"
+              class="repo-badge npm"
+            >
+              <span class="repo-text">NPM</span>
+              <span class="repo-arrow">→</span>
+            </a>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p>
+          Developed by
+          <a href="https://mikkelscheike.com" target="_blank">Mikkel Scheike</a>
+        </p>
+      </footer>
     </div>
 
     <script src="script-api.js"></script>
-</body>
+  </body>
 </html>

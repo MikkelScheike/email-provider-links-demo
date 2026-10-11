@@ -1,125 +1,216 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>About Email Provider Links - Simplifying User Onboarding</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <!-- Skip navigation link for accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    
-    <div class="container">
-        <!-- Header -->
-        <div class="demo-header">
-        </div>
 
-        <main id="main-content" class="signup-card about-page">
-            <!-- What is it? -->
-            <section class="about-section">
-                <h2>What is Email Provider Links?</h2>
-                <p>Email Provider Links is a <strong>completely free and open source</strong> JavaScript/TypeScript library that automatically detects email providers and retrieves their login URLs. It helps create seamless user experiences by guiding users directly to their email inbox after registration or email verification. <strong>100% Free Forever:</strong>
-                
-                <!-- Key Statistics -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number">100%</div>
-                        <div class="stat-label">Free</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">140</div>
-                        <div class="stat-label">Email Providers</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">259</div>
-                        <div class="stat-label">Domains Supported</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">~89%</div>
-                        <div class="stat-label">Code Coverage</div>
-                    </div>
-                </div>
-                
-                <!-- How It Works -->
-                <h2>How does it work?</h2>
-                
-                <p style="margin-bottom: 2rem;">The library uses a multi-step detection process that combines fast database lookups with intelligent DNS analysis. Here's exactly what happens when you call <code>getEmailProvider(email)</code>:</p>
-                
-                <div class="technical-details">
-                    <div class="detection-method">
-                        <h3>Step 1: Email Parsing & Normalization</h3>
-                        <p>First, the email address is parsed and normalized:</p>
-                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
-                            <li>Extracts the domain from the email (e.g., <code>example.com</code> from <code>user@example.com</code>)</li>
-                            <li>Normalizes Gmail addresses by removing dots and plus aliases (e.g., <code>john.doe+tag@gmail.com</code> → <code>johndoe@gmail.com</code>)</li>
-                            <li>Handles common email alias patterns for other providers</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="detection-method">
-                        <h3>Step 2: Domain Database Lookup</h3>
-                        <p>The library maintains a comprehensive database of 259 email domains mapped to their providers. This includes:</p>
-                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
-                            <li><strong>Consumer providers:</strong> gmail.com → Gmail, outlook.com → Microsoft Outlook, yahoo.com → Yahoo Mail, etc.</li>
-                            <li><strong>International variants:</strong> gmail.co.uk, outlook.fr, yahoo.co.jp, and many more</li>
-                            <li><strong>Provider aliases:</strong> Multiple domains pointing to the same provider (e.g., hotmail.com, live.com → Outlook)</li>
-                        </ul>
-                        <p style="margin-top: 0.75rem;"><strong>Result:</strong> If found, returns instantly with <code>detectionMethod: 'domain_match'</code> (typically &lt;1ms).</p>
-                    </div>
-                    
-                    <div class="detection-method">
-                        <h3>Step 3: DNS MX Record Analysis</h3>
-                        <p>If the domain isn't in the database (common for business/custom domains), the library performs DNS lookups:</p>
-                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
-                            <li><strong>MX Record Query:</strong> Queries DNS for Mail Exchange (MX) records to find the mail server</li>
-                            <li><strong>Pattern Matching:</strong> Analyzes MX record hostnames for known patterns:
-                                <ul style="margin-top: 0.25rem; padding-left: 1.25rem;">
-                                    <li><code>*.google.com</code> or <code>*.googlemail.com</code> → Google Workspace</li>
-                                    <li><code>*.outlook.com</code>, <code>*.office365.com</code>, <code>*.mail.protection.outlook.com</code> → Microsoft 365</li>
-                                    <li><code>*.yahoo.com</code>, <code>*.yahoodns.net</code> → Yahoo Mail</li>
-                                    <li>And many more patterns for other providers</li>
-                                </ul>
-                            </li>
-                            <li><strong>Timeout Protection:</strong> DNS queries are limited by a configurable timeout (default 5 seconds) to prevent hanging</li>
-                        </ul>
-                        <p style="margin-top: 0.75rem;"><strong>Result:</strong> If a pattern matches, returns with <code>detectionMethod: 'mx_record'</code> or <code>detectionMethod: 'mx_pattern'</code> (typically 50-500ms depending on DNS response time).</p>
-                    </div>
-                    
-                    <div class="detection-method">
-                        <h3>Step 4: Heuristic Detection</h3>
-                        <p>For domains that don't match known patterns, the library uses heuristics to detect:</p>
-                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
-                            <li><strong>Email Alias Services:</strong> Detects proxy/alias services like SimpleLogin, AnonAddy, Firefox Relay by analyzing MX records and domain patterns</li>
-                            <li><strong>Provider-Specific Patterns:</strong> Recognizes common email forwarding services and their characteristics</li>
-                            <li><strong>Domain Analysis:</strong> Examines domain structure, TLD patterns, and other signals</li>
-                        </ul>
-                        <p style="margin-top: 0.75rem;"><strong>Result:</strong> May identify proxy services or provide hints about the email infrastructure.</p>
-                    </div>
-                    
-                    <div class="detection-method">
-                        <h3>Step 5: Login URL Retrieval</h3>
-                        <p>Once a provider is identified, the library retrieves the appropriate login URL:</p>
-                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
-                            <li><strong>Pre-configured URLs:</strong> Each provider in the database has a verified HTTPS login URL</li>
-                            <li><strong>Security Validation:</strong> All URLs are validated to ensure they:
-                                <ul style="margin-top: 0.25rem; padding-left: 1.25rem;">
-                                    <li>Use HTTPS protocol only</li>
-                                    <li>Match allowlisted domains</li>
-                                    <li>Pass malicious pattern detection (no IP addresses, URL shorteners, etc.)</li>
-                                    <li>Are protected against injection attacks</li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <div class="detection-method">
-                        <h3>Step 6: Response Formatting</h3>
-                        <p>The library returns a structured result object:</p>
-                        <pre class="about-code-block"><code>{
+    <div class="container">
+      <!-- Header -->
+      <div class="demo-header"></div>
+
+      <main id="main-content" class="signup-card about-page">
+        <!-- What is it? -->
+        <section class="about-section">
+          <h2>What is Email Provider Links?</h2>
+          <p>
+            Email Provider Links is a
+            <strong>completely free and open source</strong>
+            JavaScript/TypeScript library that automatically detects email
+            providers and retrieves their login URLs. It helps create seamless
+            user experiences by guiding users directly to their email inbox
+            after registration or email verification.
+            <strong>100% Free Forever:</strong>
+
+            <!-- Key Statistics -->
+          </p>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-number">100%</div>
+              <div class="stat-label">Free</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">140</div>
+              <div class="stat-label">Email Providers</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">259</div>
+              <div class="stat-label">Domains Supported</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">~89%</div>
+              <div class="stat-label">Code Coverage</div>
+            </div>
+          </div>
+
+          <!-- How It Works -->
+          <h2>How does it work?</h2>
+
+          <p style="margin-bottom: 2rem">
+            The library uses a multi-step detection process that combines fast
+            database lookups with intelligent DNS analysis. Here's exactly what
+            happens when you call <code>getEmailProvider(email)</code>:
+          </p>
+
+          <div class="technical-details">
+            <div class="detection-method">
+              <h3>Step 1: Email Parsing & Normalization</h3>
+              <p>First, the email address is parsed and normalized:</p>
+              <ul style="margin-top: 0.5rem; padding-left: 1.5rem">
+                <li>
+                  Extracts the domain from the email (e.g.,
+                  <code>example.com</code> from <code>user@example.com</code>)
+                </li>
+                <li>
+                  Normalizes Gmail addresses by removing dots and plus aliases
+                  (e.g., <code>john.doe+tag@gmail.com</code> →
+                  <code>johndoe@gmail.com</code>)
+                </li>
+                <li>Handles common email alias patterns for other providers</li>
+              </ul>
+            </div>
+
+            <div class="detection-method">
+              <h3>Step 2: Domain Database Lookup</h3>
+              <p>
+                The library maintains a comprehensive database of 259 email
+                domains mapped to their providers. This includes:
+              </p>
+              <ul style="margin-top: 0.5rem; padding-left: 1.5rem">
+                <li>
+                  <strong>Consumer providers:</strong> gmail.com → Gmail,
+                  outlook.com → Microsoft Outlook, yahoo.com → Yahoo Mail, etc.
+                </li>
+                <li>
+                  <strong>International variants:</strong> gmail.co.uk,
+                  outlook.fr, yahoo.co.jp, and many more
+                </li>
+                <li>
+                  <strong>Provider aliases:</strong> Multiple domains pointing
+                  to the same provider (e.g., hotmail.com, live.com → Outlook)
+                </li>
+              </ul>
+              <p style="margin-top: 0.75rem">
+                <strong>Result:</strong> If found, returns instantly with
+                <code>detectionMethod: 'domain_match'</code> (typically
+                &lt;1ms).
+              </p>
+            </div>
+
+            <div class="detection-method">
+              <h3>Step 3: DNS MX Record Analysis</h3>
+              <p>
+                If the domain isn't in the database (common for business/custom
+                domains), the library performs DNS lookups:
+              </p>
+              <ul style="margin-top: 0.5rem; padding-left: 1.5rem">
+                <li>
+                  <strong>MX Record Query:</strong> Queries DNS for Mail
+                  Exchange (MX) records to find the mail server
+                </li>
+                <li>
+                  <strong>Pattern Matching:</strong> Analyzes MX record
+                  hostnames for known patterns:
+                  <ul style="margin-top: 0.25rem; padding-left: 1.25rem">
+                    <li>
+                      <code>*.google.com</code> or
+                      <code>*.googlemail.com</code> → Google Workspace
+                    </li>
+                    <li>
+                      <code>*.outlook.com</code>, <code>*.office365.com</code>,
+                      <code>*.mail.protection.outlook.com</code> → Microsoft 365
+                    </li>
+                    <li>
+                      <code>*.yahoo.com</code>, <code>*.yahoodns.net</code> →
+                      Yahoo Mail
+                    </li>
+                    <li>And many more patterns for other providers</li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Timeout Protection:</strong> DNS queries are limited
+                  by a configurable timeout (default 5 seconds) to prevent
+                  hanging
+                </li>
+              </ul>
+              <p style="margin-top: 0.75rem">
+                <strong>Result:</strong> If a pattern matches, returns with
+                <code>detectionMethod: 'mx_record'</code> or
+                <code>detectionMethod: 'mx_pattern'</code> (typically 50-500ms
+                depending on DNS response time).
+              </p>
+            </div>
+
+            <div class="detection-method">
+              <h3>Step 4: Heuristic Detection</h3>
+              <p>
+                For domains that don't match known patterns, the library uses
+                heuristics to detect:
+              </p>
+              <ul style="margin-top: 0.5rem; padding-left: 1.5rem">
+                <li>
+                  <strong>Email Alias Services:</strong> Detects proxy/alias
+                  services like SimpleLogin, AnonAddy, Firefox Relay by
+                  analyzing MX records and domain patterns
+                </li>
+                <li>
+                  <strong>Provider-Specific Patterns:</strong> Recognizes common
+                  email forwarding services and their characteristics
+                </li>
+                <li>
+                  <strong>Domain Analysis:</strong> Examines domain structure,
+                  TLD patterns, and other signals
+                </li>
+              </ul>
+              <p style="margin-top: 0.75rem">
+                <strong>Result:</strong> May identify proxy services or provide
+                hints about the email infrastructure.
+              </p>
+            </div>
+
+            <div class="detection-method">
+              <h3>Step 5: Login URL Retrieval</h3>
+              <p>
+                Once a provider is identified, the library retrieves the
+                appropriate login URL:
+              </p>
+              <ul style="margin-top: 0.5rem; padding-left: 1.5rem">
+                <li>
+                  <strong>Pre-configured URLs:</strong> Each provider in the
+                  database has a verified HTTPS login URL
+                </li>
+                <li>
+                  <strong>Security Validation:</strong> All URLs are validated
+                  to ensure they:
+                  <ul style="margin-top: 0.25rem; padding-left: 1.25rem">
+                    <li>Use HTTPS protocol only</li>
+                    <li>Match allowlisted domains</li>
+                    <li>
+                      Pass malicious pattern detection (no IP addresses, URL
+                      shorteners, etc.)
+                    </li>
+                    <li>Are protected against injection attacks</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+            <div class="detection-method">
+              <h3>Step 6: Response Formatting</h3>
+              <p>The library returns a structured result object:</p>
+              <pre class="about-code-block"><code>{
   provider: {
     companyProvider: "Gmail",
     loginUrl: "https://mail.google.com/mail/"
@@ -131,248 +222,302 @@
   // - Detection timing breakdown
   // - Provider metadata
 }</code></pre>
-                    </div>
-                </div>
-                
-                <div class="performance-block">
-                    <h3>Performance Characteristics</h3>
-                    <ul>
-                        <li><strong>Known domains:</strong> &lt;1ms (instant database lookup)</li>
-                        <li><strong>Business domains:</strong> 50-500ms (DNS MX record lookup)</li>
-                        <li><strong>Unknown domains:</strong> Returns gracefully with helpful error information</li>
-                        <li><strong>Rate limiting:</strong> Built-in protection prevents DNS query abuse</li>
-                    </ul>
-                </div>
-                
-                <!-- Why use it? -->
-                <h2 class="section-heading">Why Use Email Provider Links?</h2>
-                
-                <div class="problem-solution">
-                    <div class="problem">
-                        <h3>❌ The Problem</h3>
-                        <ul>
-                            <li>Users abandon registration flows when they can't find verification emails</li>
-                            <li>Generic "check your email" messages provide no helpful guidance</li>
-                            <li>Users don't know which email app to open or where to look</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="solution">
-                        <h3>✅ The Solution</h3>
-                        <ul>
-                            <li>Automatically detect the user's email provider</li>
-                            <li>Show provider-specific instructions and branding</li>
-                            <li>Provide direct "Go to Gmail" or "Check Outlook" buttons</li>
-                            <li>Reduce user confusion and improve completion rates</li>
-                        </ul>
-                    </div>
+            </div>
+          </div>
+
+          <div class="performance-block">
+            <h3>Performance Characteristics</h3>
+            <ul>
+              <li>
+                <strong>Known domains:</strong> &lt;1ms (instant database
+                lookup)
+              </li>
+              <li>
+                <strong>Business domains:</strong> 50-500ms (DNS MX record
+                lookup)
+              </li>
+              <li>
+                <strong>Unknown domains:</strong> Returns gracefully with
+                helpful error information
+              </li>
+              <li>
+                <strong>Rate limiting:</strong> Built-in protection prevents DNS
+                query abuse
+              </li>
+            </ul>
+          </div>
+
+          <!-- Why use it? -->
+          <h2 class="section-heading">Why Use Email Provider Links?</h2>
+
+          <div class="problem-solution">
+            <div class="problem">
+              <h3>❌ The Problem</h3>
+              <ul>
+                <li>
+                  Users abandon registration flows when they can't find
+                  verification emails
+                </li>
+                <li>
+                  Generic "check your email" messages provide no helpful
+                  guidance
+                </li>
+                <li>
+                  Users don't know which email app to open or where to look
+                </li>
+              </ul>
+            </div>
+
+            <div class="solution">
+              <h3>✅ The Solution</h3>
+              <ul>
+                <li>Automatically detect the user's email provider</li>
+                <li>Show provider-specific instructions and branding</li>
+                <li>Provide direct "Go to Gmail" or "Check Outlook" buttons</li>
+                <li>Reduce user confusion and improve completion rates</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Comprehensive Features -->
+          <h2 class="section-heading">Benefits</h2>
+          <div class="features-comprehensive">
+            <div class="feature-item">
+              <span class="feature-emoji">💯</span>
+              <div class="feature-content">
+                <strong>100% Free:</strong> No subscriptions, no hidden costs,
+                completely open source
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <span class="feature-emoji">🚀</span>
+              <div class="feature-content">
+                <strong>Fast & Lightweight:</strong> Zero dependencies, minimal
+                footprint
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <span class="feature-emoji">📧</span>
+              <div class="feature-content">
+                <strong>140 Email Providers:</strong> Gmail, Outlook, Yahoo,
+                ProtonMail, iCloud, and many more
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <span class="feature-emoji">🌐</span>
+              <div class="feature-content">
+                <strong>259 Domains Supported:</strong> Comprehensive
+                international coverage
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <span class="feature-emoji">🏢</span>
+              <div class="feature-content">
+                <strong>Business Domain Detection:</strong> DNS-based detection
+                for custom domains (Google Workspace, Microsoft 365, etc.)
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <span class="feature-emoji">🔒</span>
+              <div class="feature-content">
+                <strong>Enterprise Security:</strong> Multi-layer protection
+                against malicious URLs and supply chain attacks
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <span class="feature-emoji">🛡️</span>
+              <div class="feature-content">
+                <strong>URL Validation:</strong> HTTPS-only enforcement with
+                domain allowlisting
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <span class="feature-emoji">🔐</span>
+              <div class="feature-content">
+                <strong>Integrity Verification:</strong> Cryptographic hash
+                verification for data integrity
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <span class="feature-emoji">📝</span>
+              <div class="feature-content">
+                <strong>Type Safe:</strong> Full TypeScript support with
+                comprehensive interfaces
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <span class="feature-emoji">⚡</span>
+              <div class="feature-content">
+                <strong>Performance Optimized:</strong> Smart DNS fallback with
+                configurable timeouts
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <span class="feature-emoji">🚦</span>
+              <div class="feature-content">
+                <strong>Rate Limiting:</strong> Built-in DNS query rate limiting
+                to prevent abuse
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <span class="feature-emoji">🔄</span>
+              <div class="feature-content">
+                <strong>Email Alias Detection:</strong> Normalize Gmail dots,
+                plus addressing, and provider-specific aliases
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <span class="feature-emoji">🛡️</span>
+              <div class="feature-content">
+                <strong>Fraud Prevention:</strong> Detect duplicate accounts
+                through email alias manipulation
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <span class="feature-emoji">🧪</span>
+              <div class="feature-content">
+                <strong>Thoroughly Tested:</strong> 439 tests with ~89% code
+                coverage
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Use Cases -->
+        <section class="about-section">
+          <h2>Perfect For</h2>
+
+          <div class="use-cases">
+            <div class="use-case">
+              <h3>🚀 User Registration</h3>
+              <p>
+                Guide new users directly to their inbox after they sign up,
+                improving email verification completion rates.
+              </p>
+            </div>
+
+            <div class="use-case">
+              <h3>🔐 Password Reset</h3>
+              <p>
+                Help users quickly find and access password reset emails by
+                showing them exactly where to look.
+              </p>
+            </div>
+
+            <div class="use-case">
+              <h3>📧 Email Verification</h3>
+              <p>
+                Reduce bounce rates in verification flows by providing clear,
+                provider-specific guidance.
+              </p>
+            </div>
+
+            <div class="use-case">
+              <h3>💼 Business Applications</h3>
+              <p>
+                Detect corporate email systems and provide appropriate messaging
+                for business users.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Security & Protection -->
+        <section class="about-section">
+          <h2>Enterprise-Grade Security</h2>
+
+          <div class="security-overview">
+            <div class="security-category">
+              <div class="security-features">
+                <div class="security-item">
+                  <span class="security-icon">🔒</span>
+                  <div class="security-content">
+                    <strong>HTTPS-Only Enforcement:</strong><br />All provider
+                    URLs must use HTTPS protocol
+                  </div>
                 </div>
 
-                <!-- Comprehensive Features -->
-                <h2 class="section-heading">Benefits</h2>
-                <div class="features-comprehensive">
-                    <div class="feature-item">
-                        <span class="feature-emoji">💯</span>
-                        <div class="feature-content">
-                            <strong>100% Free:</strong> No subscriptions, no hidden costs, completely open source
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <span class="feature-emoji">🚀</span>
-                        <div class="feature-content">
-                            <strong>Fast & Lightweight:</strong> Zero dependencies, minimal footprint
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <span class="feature-emoji">📧</span>
-                        <div class="feature-content">
-                            <strong>140 Email Providers:</strong> Gmail, Outlook, Yahoo, ProtonMail, iCloud, and many more
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <span class="feature-emoji">🌐</span>
-                        <div class="feature-content">
-                            <strong>259 Domains Supported:</strong> Comprehensive international coverage
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <span class="feature-emoji">🏢</span>
-                        <div class="feature-content">
-                            <strong>Business Domain Detection:</strong> DNS-based detection for custom domains (Google Workspace, Microsoft 365, etc.)
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <span class="feature-emoji">🔒</span>
-                        <div class="feature-content">
-                            <strong>Enterprise Security:</strong> Multi-layer protection against malicious URLs and supply chain attacks
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <span class="feature-emoji">🛡️</span>
-                        <div class="feature-content">
-                            <strong>URL Validation:</strong> HTTPS-only enforcement with domain allowlisting
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <span class="feature-emoji">🔐</span>
-                        <div class="feature-content">
-                            <strong>Integrity Verification:</strong> Cryptographic hash verification for data integrity
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <span class="feature-emoji">📝</span>
-                        <div class="feature-content">
-                            <strong>Type Safe:</strong> Full TypeScript support with comprehensive interfaces
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <span class="feature-emoji">⚡</span>
-                        <div class="feature-content">
-                            <strong>Performance Optimized:</strong> Smart DNS fallback with configurable timeouts
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <span class="feature-emoji">🚦</span>
-                        <div class="feature-content">
-                            <strong>Rate Limiting:</strong> Built-in DNS query rate limiting to prevent abuse
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <span class="feature-emoji">🔄</span>
-                        <div class="feature-content">
-                            <strong>Email Alias Detection:</strong> Normalize Gmail dots, plus addressing, and provider-specific aliases
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <span class="feature-emoji">🛡️</span>
-                        <div class="feature-content">
-                            <strong>Fraud Prevention:</strong> Detect duplicate accounts through email alias manipulation
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <span class="feature-emoji">🧪</span>
-                        <div class="feature-content">
-                            <strong>Thoroughly Tested:</strong> 439 tests with ~89% code coverage
-                        </div>
-                    </div>
-                    
+                <div class="security-item">
+                  <span class="security-icon">📋</span>
+                  <div class="security-content">
+                    <strong>Domain Allowlisting:</strong><br />Only pre-approved
+                    domains are allowed (140 verified providers)
+                  </div>
                 </div>
-            </section>
 
-            <!-- Use Cases -->
-            <section class="about-section">
-                <h2>Perfect For</h2>
-                
-                <div class="use-cases">
-                    <div class="use-case">
-                        <h3>🚀 User Registration</h3>
-                        <p>Guide new users directly to their inbox after they sign up, improving email verification completion rates.</p>
-                    </div>
-                    
-                    <div class="use-case">
-                        <h3>🔐 Password Reset</h3>
-                        <p>Help users quickly find and access password reset emails by showing them exactly where to look.</p>
-                    </div>
-                    
-                    <div class="use-case">
-                        <h3>📧 Email Verification</h3>
-                        <p>Reduce bounce rates in verification flows by providing clear, provider-specific guidance.</p>
-                    </div>
-                    
-                    <div class="use-case">
-                        <h3>💼 Business Applications</h3>
-                        <p>Detect corporate email systems and provide appropriate messaging for business users.</p>
-                    </div>
+                <div class="security-item">
+                  <span class="security-icon">🛡️</span>
+                  <div class="security-content">
+                    <strong>Malicious Pattern Detection:</strong><br />Blocks IP
+                    addresses, URL shorteners, suspicious TLDs
+                  </div>
                 </div>
-            </section>
 
-            <!-- Security & Protection -->
-            <section class="about-section">
-                <h2>Enterprise-Grade Security</h2>
-                
-                <div class="security-overview">
-                    <div class="security-category">
-                        <div class="security-features">
-                            <div class="security-item">
-                                <span class="security-icon">🔒</span>
-                                <div class="security-content">
-                                    <strong>HTTPS-Only Enforcement:</strong><br>All provider URLs must use HTTPS protocol
-                                </div>
-                            </div>
-                            
-                            <div class="security-item">
-                                <span class="security-icon">📋</span>
-                                <div class="security-content">
-                                    <strong>Domain Allowlisting:</strong><br>Only pre-approved domains are allowed (140 verified providers)
-                                </div>
-                            </div>
-                            
-                            <div class="security-item">
-                                <span class="security-icon">🛡️</span>
-                                <div class="security-content">
-                                    <strong>Malicious Pattern Detection:</strong><br>Blocks IP addresses, URL shorteners, suspicious TLDs
-                                </div>
-                            </div>
-                            
-                            <div class="security-item">
-                                <span class="security-icon">🚫</span>
-                                <div class="security-content">
-                                    <strong>Path Traversal Prevention:</strong><br>Detects and blocks ../ and encoded variants
-                                </div>
-                            </div>
-                            
-                            <div class="security-item">
-                                <span class="security-icon">⚡</span>
-                                <div class="security-content">
-                                    <strong>JavaScript Injection Protection:</strong><br>Prevents javascript:, data:, and script injections
-                                </div>
-                            </div>
-                            
-                            <div class="security-item">
-                                <span class="security-icon">🔐</span>
-                                <div class="security-content">
-                                    <strong>File Integrity Verification:</strong><br>SHA-256 hash verification for provider database
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="security-item">
+                  <span class="security-icon">🚫</span>
+                  <div class="security-content">
+                    <strong>Path Traversal Prevention:</strong><br />Detects and
+                    blocks ../ and encoded variants
+                  </div>
                 </div>
-            </section>
 
+                <div class="security-item">
+                  <span class="security-icon">⚡</span>
+                  <div class="security-content">
+                    <strong>JavaScript Injection Protection:</strong
+                    ><br />Prevents javascript:, data:, and script injections
+                  </div>
+                </div>
 
-            <!-- Getting Started -->
-            <section class="about-section">
-                <h2>Get Started</h2>
-                
-                <div class="getting-started">
-                    <div class="install-section">
-                        <h3>📦 Installation</h3>
-                        <p style="margin-bottom: 1rem;">Install using npm:</p>
-                        <div class="install-command" onclick="copyInstallCommand()" title="Click to copy">
-                            <pre><code>npm install @mikkelscheike/email-provider-links</code></pre>
-                            <div class="copy-indicator">
-                                <span class="copy-icon">📋</span>
-                                <span class="copy-text">Click to copy</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="usage-section">
-                        <h3>🛠️ Basic Usage</h3>
-                        <pre><code>import { getEmailProvider } from '@mikkelscheike/email-provider-links';
+                <div class="security-item">
+                  <span class="security-icon">🔐</span>
+                  <div class="security-content">
+                    <strong>File Integrity Verification:</strong><br />SHA-256
+                    hash verification for provider database
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Getting Started -->
+        <section class="about-section">
+          <h2>Get Started</h2>
+
+          <div class="getting-started">
+            <div class="install-section">
+              <h3>📦 Installation</h3>
+              <p style="margin-bottom: 1rem">Install using npm:</p>
+              <div
+                class="install-command"
+                onclick="copyInstallCommand()"
+                title="Click to copy"
+              >
+                <pre><code>npm install @mikkelscheike/email-provider-links</code></pre>
+                <div class="copy-indicator">
+                  <span class="copy-icon">📋</span>
+                  <span class="copy-text">Click to copy</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="usage-section">
+              <h3>🛠️ Basic Usage</h3>
+              <pre><code>import { getEmailProvider } from '@mikkelscheike/email-provider-links';
 
 const result = await getEmailProvider('user@gmail.com');
 console.log(result);
@@ -390,112 +535,166 @@ const resultExtended = await getEmailProvider('user@gmail.com', {
   timeout: 5000,
   extended: true
 });</code></pre>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Built With Amazing Tools -->
-            <section class="about-section">
-                <h2>Built With Amazing Tools</h2>
-                
-                <div class="use-cases tools-grid">
-                    <div class="use-case">
-                        <h3>⚡ Warp Terminal</h3>
-                        <p><strong><a href="https://app.warp.dev/referral/LQVRNX" target="_blank" rel="noopener" class="tool-link">Warp</a></strong> is the modern, AI-powered terminal that made this development process incredibly fast and efficient. With its intelligent command completion, AI assistance, and modern interface, Warp transformed how I interacted with the codebase.</p>
-                        <div style="margin-top: 1rem; text-align: center;">
-                            <a href="https://app.warp.dev/referral/LQVRNX" target="_blank" rel="noopener" class="tool-cta">Try Warp Terminal →</a>
-                        </div>
-                    </div>
-                    
-                    <div class="use-case">
-                        <h3>🐙 GitKraken</h3>
-                        <p><strong><a href="https://gitkraken.cello.so/rQGpNxwiUQg" target="_blank" rel="noopener" class="tool-link">GitKraken</a></strong> provided powerful Git visualization and management capabilities that streamlined our version control workflow. Its intuitive interface and advanced merge tools made managing the codebase seamless and efficient.</p>
-                        <div style="margin-top: 1rem; text-align: center;">
-                            <a href="https://gitkraken.cello.so/rQGpNxwiUQg" target="_blank" rel="noopener" class="tool-cta">Try GitKraken →</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Navigation -->
-            <div class="navigation-section">
-                <div class="primary-nav-buttons">
-                    <a href="/" class="nav-button primary">← Try the Demo</a>
-                    <a href="#top" class="nav-button primary">↑ Back to Top</a>
-                </div>
-                <div class="external-links">
-                    <a href="https://github.com/MikkelScheike/email-provider-links" target="_blank" class="nav-button">
-                        📚 Documentation
-                    </a>
-                    <a href="https://www.npmjs.com/package/@mikkelscheike/email-provider-links" target="_blank" class="nav-button">
-                        📦 NPM Package
-                    </a>
-                </div>
             </div>
-        </main>
-        
-        <!-- Footer -->
-        <footer class="footer">
-            <p>Developed by <a href="https://mikkelscheike.com" target="_blank">Mikkel Scheike</a></p>
-        </footer>
+          </div>
+        </section>
+
+        <!-- Built With Amazing Tools -->
+        <section class="about-section">
+          <h2>Built With Amazing Tools</h2>
+
+          <div class="use-cases tools-grid">
+            <div class="use-case">
+              <h3>⚡ Warp Terminal</h3>
+              <p>
+                <strong
+                  ><a
+                    href="https://app.warp.dev/referral/LQVRNX"
+                    target="_blank"
+                    rel="noopener"
+                    class="tool-link"
+                    >Warp</a
+                  ></strong
+                >
+                is the modern, AI-powered terminal that made this development
+                process incredibly fast and efficient. With its intelligent
+                command completion, AI assistance, and modern interface, Warp
+                transformed how I interacted with the codebase.
+              </p>
+              <div style="margin-top: 1rem; text-align: center">
+                <a
+                  href="https://app.warp.dev/referral/LQVRNX"
+                  target="_blank"
+                  rel="noopener"
+                  class="tool-cta"
+                  >Try Warp Terminal →</a
+                >
+              </div>
+            </div>
+
+            <div class="use-case">
+              <h3>🐙 GitKraken</h3>
+              <p>
+                <strong
+                  ><a
+                    href="https://gitkraken.cello.so/rQGpNxwiUQg"
+                    target="_blank"
+                    rel="noopener"
+                    class="tool-link"
+                    >GitKraken</a
+                  ></strong
+                >
+                provided powerful Git visualization and management capabilities
+                that streamlined our version control workflow. Its intuitive
+                interface and advanced merge tools made managing the codebase
+                seamless and efficient.
+              </p>
+              <div style="margin-top: 1rem; text-align: center">
+                <a
+                  href="https://gitkraken.cello.so/rQGpNxwiUQg"
+                  target="_blank"
+                  rel="noopener"
+                  class="tool-cta"
+                  >Try GitKraken →</a
+                >
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Navigation -->
+        <div class="navigation-section">
+          <div class="primary-nav-buttons">
+            <a href="/" class="nav-button primary">← Try the Demo</a>
+            <a href="#top" class="nav-button primary">↑ Back to Top</a>
+          </div>
+          <div class="external-links">
+            <a
+              href="https://github.com/MikkelScheike/email-provider-links"
+              target="_blank"
+              class="nav-button"
+            >
+              📚 Documentation
+            </a>
+            <a
+              href="https://www.npmjs.com/package/@mikkelscheike/email-provider-links"
+              target="_blank"
+              class="nav-button"
+            >
+              📦 NPM Package
+            </a>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p>
+          Developed by
+          <a href="https://mikkelscheike.com" target="_blank">Mikkel Scheike</a>
+        </p>
+      </footer>
     </div>
 
     <script>
-        // Copy install command to clipboard
-        function copyInstallCommand() {
-            const command = 'npm install @mikkelscheike/email-provider-links';
-            
-            if (navigator.clipboard && window.isSecureContext) {
-                // Use modern clipboard API
-                navigator.clipboard.writeText(command).then(() => {
-                    showCopyFeedback();
-                }).catch(err => {
-                    console.error('Failed to copy: ', err);
-                    fallbackCopy(command);
-                });
-            } else {
-                // Fallback for older browsers or non-HTTPS
-                fallbackCopy(command);
-            }
+      // Copy install command to clipboard
+      function copyInstallCommand() {
+        const command = "npm install @mikkelscheike/email-provider-links";
+
+        if (navigator.clipboard && window.isSecureContext) {
+          // Use modern clipboard API
+          navigator.clipboard
+            .writeText(command)
+            .then(() => {
+              showCopyFeedback();
+            })
+            .catch((err) => {
+              console.error("Failed to copy: ", err);
+              fallbackCopy(command);
+            });
+        } else {
+          // Fallback for older browsers or non-HTTPS
+          fallbackCopy(command);
         }
-        
-        function fallbackCopy(text) {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            textArea.style.position = 'fixed';
-            textArea.style.left = '-999999px';
-            textArea.style.top = '-999999px';
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            
-            try {
-                document.execCommand('copy');
-                showCopyFeedback();
-            } catch (err) {
-                console.error('Fallback copy failed: ', err);
-            }
-            
-            document.body.removeChild(textArea);
+      }
+
+      function fallbackCopy(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+          document.execCommand("copy");
+          showCopyFeedback();
+        } catch (err) {
+          console.error("Fallback copy failed: ", err);
         }
-        
-        function showCopyFeedback() {
-            const copyText = document.querySelector('.copy-text');
-            const copyIcon = document.querySelector('.copy-icon');
-            
-            if (copyText && copyIcon) {
-                const originalText = copyText.textContent;
-                const originalIcon = copyIcon.textContent;
-                
-                copyText.textContent = 'Copied!';
-                copyIcon.textContent = '✅';
-                
-                setTimeout(() => {
-                    copyText.textContent = originalText;
-                    copyIcon.textContent = originalIcon;
-                }, 2000);
-            }
+
+        document.body.removeChild(textArea);
+      }
+
+      function showCopyFeedback() {
+        const copyText = document.querySelector(".copy-text");
+        const copyIcon = document.querySelector(".copy-icon");
+
+        if (copyText && copyIcon) {
+          const originalText = copyText.textContent;
+          const originalIcon = copyIcon.textContent;
+
+          copyText.textContent = "Copied!";
+          copyIcon.textContent = "✅";
+
+          setTimeout(() => {
+            copyText.textContent = originalText;
+            copyIcon.textContent = originalIcon;
+          }, 2000);
         }
+      }
     </script>
-</body>
+  </body>
 </html>
